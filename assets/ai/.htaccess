@@ -1,0 +1,10 @@
+# File internal AI tidak boleh diakses langsung dari browser.
+<FilesMatch "^(config|ai_client|chat_widget)\.php$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>

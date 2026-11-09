@@ -1,0 +1,344 @@
+
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(90deg, #e2e2e2, #c9d6ff);
+}
+
+.container{
+    position: relative;
+    width:850px;
+    height: 550px;
+    background: #fff;
+    border-radius: 30px;
+    box-shadow: 0 0 36px rgba(0, 0, 0, .2);
+    margin: 20px;
+    overflow: hidden;
+}
+
+.toggle-panel .back-btn{
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    z-index: 10;
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border: 1px solid #fff;
+    border-radius: 6px;
+    background: #7494ec;
+    transition: all 0.3s;
+}
+
+.toggle-panel .back-btn:hover{
+    background: #fff;
+    color: #7494ec;
+}
+
+.form-box{
+    position: absolute;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    color: #333;
+    text-align: center;    
+    padding: 40px;
+    z-index: 1;
+    transition: .6s ease-in-out 1.2s, visibility 0s 1s;
+}
+
+.container.active .form-box{
+    right: 50%;
+}
+
+.form-box.register{
+    visibility: hidden; 
+}
+
+.container.active .form-box.register{
+    visibility: visible;
+}
+form{
+    width: 100%;
+}
+
+.container h1{
+    font-size: 36px;
+    margin: 10px 0;
+}
+
+.input-box{
+    position: relative;
+    margin: 16px 0;
+
+}
+
+.input-box input{
+    width: 100%;
+    padding: 13px 50px 13px 20px;
+    background: #eee;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+}
+
+.input-box input::placeholder{
+    color: #888;
+    font-weight: 400;
+}
+
+input, select{
+    width: 100%;
+    padding: 13px 50px 13px 20px;
+    background: #eee;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 18px ;
+}
+
+.forgot-link{
+    margin: -15px 0 15px;
+}
+
+.forgot-link a{
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;   
+}
+
+.forgot-link a:hover{
+    color: blue;
+    transition: .3s ease-in-out;
+}
+
+.btn{
+    width: 100%;
+    height: 48px;
+    background: #7494ec;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #fff;
+    font-weight: 600;
+}
+
+
+.toggle-box{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+}
+
+.toggle-box::before{
+    content: '';
+    position: absolute;
+    left: -250%;
+    width: 300%;
+    height: 100%;
+    background: #7494ec;
+    z-index: 2;
+    border-radius: 150px;
+    transition: 1.8s ease-in-out;
+}
+
+.container.active .toggle-box::before{
+    left: 50%;
+
+}
+
+.toggle-panel{
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    z-index: 2;
+    transition: .6s ease-in-out;
+    
+}
+
+.toggle-panel.toggle-left{
+    left: 0;
+    transition-delay: 1.2s;
+}
+
+.container.active .toggle-panel.toggle-left{
+    left: -50%;
+    transition-delay: .6s;
+
+}
+
+.toggle-panel.toggle-right{
+    right: -50%;
+    transition-delay: .6s;
+}
+
+.container.active .toggle-panel.toggle-right{
+    right: 0;
+    transition-delay: 1.2s;
+
+}
+.toggle-panel h1{
+    margin: 10px;
+}
+
+.toggle-panel p{
+    margin-bottom: 20px;
+}
+
+.toggle-panel .btn{
+    width: 160px;
+    height: 46px;
+    background: transparent;
+    border: 2px solid #fff;
+    box-shadow: none;
+}
+
+@media screen and (max-width : 850px){
+    body{
+        align-items: flex-start;
+    }
+    .container{
+        height: calc(100vh - 40px);
+    }
+    .form-box{
+        width: 100%;
+        height: 64%;
+        bottom: 0;
+        align-items: flex-start;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 28px 24px 52px;
+        scroll-padding-block: 16px;
+        transition: right .6s ease-in-out 1.2s,
+                    bottom .6s ease-in-out 1.2s,
+                    visibility 0s 1s;
+    }
+    .form-box form{
+        margin: auto 0;
+        width: 100%;
+    }
+    .container.active .form-box{
+        right: 0;
+        bottom: 36%;
+    }
+    .toggle-box::before{
+        height: 146%;
+        width: 100%;
+        left: 0;
+        top: -110%;
+        border-radius: 20vw;
+        transition: left 1.8s ease-in-out,
+                    top 1.8s ease-in-out;
+    }
+    .container.active .toggle-box::before{
+        left: 0;
+        top: 64%;
+    }
+    .toggle-panel{
+        width: 100%;
+        height: 36%;
+        padding: 32px 16px 20px;
+        transition: left .6s ease-in-out,
+                    right .6s ease-in-out,
+                    top .6s ease-in-out,
+                    bottom .6s ease-in-out;
+    }
+    .toggle-panel .back-btn{
+        top: 12px;
+        left: 16px;
+        margin: 0;
+    }
+    .toggle-panel h1{
+        margin: 4px 0;
+    }
+    .toggle-panel p{
+        margin-bottom: 12px;
+    }
+    .toggle-panel.toggle-left{
+        top: 0;
+    }
+    .container.active .toggle-panel.toggle-left{
+        left: 0;
+        top: -36%;
+    }
+    .toggle-panel.toggle-right{
+        right: 0;
+        bottom: -36%;
+    }
+    .container.active .toggle-panel.toggle-right{
+        bottom: 0;
+    }
+
+    /* Saat keyboard HP terbuka, container mengikuti tinggi layar yang
+       terlihat supaya form bisa di-scroll dan tidak menabrak panel biru */
+    body.keyboard-open .container{
+        height: calc(var(--vv-height, 100dvh) - 40px);
+    }
+    body.keyboard-open .toggle-panel{
+        justify-content: flex-start;
+        padding: 48px 16px 10px;
+    }
+}
+
+@media screen and (max-width : 400px){
+    .form-box{
+        padding: 20px 15px 44px;
+    }
+    .toggle-panel h1{
+        font-size: 22px;
+    }
+    .toggle-panel p{
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+}
+
+.error-message{
+    padding: 12px;
+    background: #f8d7da;
+    border-radius: 6px;
+    font-size: 16px;
+    color: red;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.forgot-link a{
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;   
+}
+
+.forgot-link a:hover{
+    color: blue;
+    transition: .3s ease-in-out;
+}
+

@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../config.php';
 ?>
 <div class="ai-chat" id="aiChat"
-     data-endpoint="../ai/chat.php"
+     data-endpoint="../asisten/chat.php"
      data-csrf="<?= htmlspecialchars(csrf_token(), ENT_QUOTES) ?>">
 
     <button type="button" class="ai-chat-toggle" id="aiChatToggle"

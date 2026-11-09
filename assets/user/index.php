@@ -53,7 +53,7 @@ if ($msg) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MotorKu - Rental Motor</title>
     <link rel="stylesheet" href="user.css?v=<?= filemtime(__DIR__ . '/user.css') ?>">
-    <link rel="stylesheet" href="../ai/chat.css?v=<?= filemtime(__DIR__ . '/../ai/chat.css') ?>">
+    <link rel="stylesheet" href="../asisten/chat.css?v=<?= filemtime(__DIR__ . '/../asisten/chat.css') ?>">
 </head>
 <body class="page-<?= htmlspecialchars($page) ?>">
 
@@ -101,9 +101,9 @@ if ($msg) {
     <p>&copy; MotorKu - Rental Motor Terpercaya</p>
 </footer>
 
-<?php include __DIR__ . '/../ai/chat_widget.php'; ?>
+<?php include __DIR__ . '/../asisten/chat_widget.php'; ?>
 
 <script src="user.js?v=<?= filemtime(__DIR__ . '/user.js') ?>"></script>
-<script src="../ai/chat.js?v=<?= filemtime(__DIR__ . '/../ai/chat.js') ?>"></script>
+<script src="../asisten/chat.js?v=<?= filemtime(__DIR__ . '/../asisten/chat.js') ?>"></script>
 </body>
 </html>

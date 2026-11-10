@@ -116,14 +116,136 @@ function ai_extract_text(array $data): string {
 }
 
 /**
- * Kirim prompt ke AgentRouter.
+ * POST JSON ke endpoint AI.
+ * Return ['raw' => string|false, 'http' => int, 'curl_error' => string].
+ */
+function ai_http_post_json(string $url, array $headers, array $payload): array {
+    $ch = curl_init($url);
+    if ($ch === false) {
+        return ['raw' => false, 'http' => 0, 'curl_error' => 'curl_init failed'];
+    }
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload, JSON_UNESCAPED_UNICODE));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_TIMEOUT, AI_TIMEOUT_SECONDS);
+    $raw = curl_exec($ch);
+    $curl_error = curl_error($ch);
+    $http = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    return ['raw' => $raw, 'http' => $http, 'curl_error' => $curl_error];
+}
+
+/** Rapikan markdown sederhana agar enak dibaca sebagai teks biasa. */
+function ai_clean_reply(string $text): string {
+    $text = preg_replace('/\*\*(.+?)\*\*/u', '$1', $text);
+    $text = str_replace(['**', '__', '`'], '', $text);
+    $text = preg_replace('/^#{1,6}\s*/mu', '', $text);
+    return trim($text);
+}
+
+/**
+ * Kirim percakapan ke provider AI aktif (gemini / agentrouter).
+ * $history: array of ['role' => 'user'|'assistant', 'content' => string]
  * Return ['ok' => bool, 'text' => string, 'error' => string, 'code' => string].
  */
-function ai_request(string $instructions, string $input): array {
+function ai_request(string $instructions, string $input, array $history = []): array {
     if (!ai_is_configured()) {
         return ['ok' => false, 'text' => '', 'error' => 'Layanan AI belum dikonfigurasi.', 'code' => 'not_configured'];
     }
+    return AI_PROVIDER === 'gemini'
+        ? ai_request_gemini($instructions, $input, $history)
+        : ai_request_agentrouter($instructions, $input);
+}
 
+/** Ambil teks jawaban dari struktur OpenAI Chat Completions. */
+function ai_extract_chat_text(array $data): string {
+    $content = $data['choices'][0]['message']['content'] ?? '';
+    if (is_string($content)) return trim($content);
+    if (is_array($content)) {
+        $parts = [];
+        foreach ($content as $c) {
+            if (is_array($c) && is_string($c['text'] ?? null)) $parts[] = trim($c['text']);
+        }
+        return trim(implode("\n", $parts));
+    }
+    return '';
+}
+
+/**
+ * Gemini via endpoint OpenAI-compatible (/chat/completions).
+ * Gemini tidak memakai filter "content-blocked" seperti AgentRouter,
+ * jadi pesan Bahasa Indonesia dikirim apa adanya (tanpa trik terjemahan).
+ */
+function ai_request_gemini(string $instructions, string $input, array $history = []): array {
+    $messages = [['role' => 'system', 'content' => $instructions]];
+    foreach ($history as $h) {
+        if (!is_array($h)) continue;
+        $content = trim((string) ($h['content'] ?? ''));
+        if ($content === '') continue;
+        $messages[] = [
+            'role' => ($h['role'] ?? '') === 'assistant' ? 'assistant' : 'user',
+            'content' => $content,
+        ];
+    }
+    $messages[] = ['role' => 'user', 'content' => $input];
+
+    $resp = ai_http_post_json(AI_API_BASE . '/chat/completions', [
+        'Content-Type: application/json',
+        'Accept: application/json',
+        'Authorization: Bearer ' . AI_API_KEY,
+    ], [
+        'model' => AI_MODEL,
+        'messages' => $messages,
+        'max_tokens' => AI_MAX_OUTPUT_TOKENS,
+        'stream' => false,
+    ]);
+
+    if ($resp['raw'] === false) {
+        error_log('ai gemini curl error: ' . $resp['curl_error']);
+        return ['ok' => false, 'text' => '', 'error' => 'Koneksi ke layanan AI gagal. Silakan coba lagi.', 'code' => 'curl'];
+    }
+
+    $data = json_decode((string) $resp['raw'], true);
+    if (!is_array($data)) {
+        error_log('ai gemini invalid response (HTTP ' . $resp['http'] . '): ' . substr((string) $resp['raw'], 0, 500));
+        return ['ok' => false, 'text' => '', 'error' => 'Layanan AI mengirim respons tidak valid.', 'code' => 'invalid_json'];
+    }
+
+    if ($resp['http'] < 200 || $resp['http'] >= 300) {
+        $code = (string) ($data['error']['code'] ?? ($data['error']['status'] ?? ''));
+        $upstream = (string) ($data['error']['message'] ?? 'unknown');
+        error_log('ai gemini upstream error (HTTP ' . $resp['http'] . ', ' . $code . '): ' . $upstream);
+
+        $message = 'Layanan AI sedang tidak tersedia. Silakan coba lagi nanti.';
+        if ($resp['http'] === 429) {
+            $message = preg_match('/(per day|daily|RPD|free tier|quota)/i', $upstream)
+                ? 'Kuota harian AI sudah habis. Silakan coba lagi besok.'
+                : 'Terlalu banyak permintaan ke AI. Tunggu sebentar lalu coba lagi.';
+            $code = $code !== '' ? $code : 'rate-limit';
+        } elseif ($resp['http'] === 401 || $resp['http'] === 403) {
+            $message = 'API key AI tidak valid atau tidak punya akses. Periksa konfigurasi.';
+        } elseif ($resp['http'] === 404) {
+            $message = 'Model AI "' . AI_MODEL . '" tidak ditemukan. Periksa AI_MODEL di konfigurasi.';
+        }
+        return ['ok' => false, 'text' => '', 'error' => $message, 'code' => $code !== '' ? $code : 'upstream'];
+    }
+
+    $text = ai_extract_chat_text($data);
+    if ($text === '') {
+        error_log('ai gemini empty output: ' . substr((string) $resp['raw'], 0, 500));
+        return ['ok' => false, 'text' => '', 'error' => 'AI tidak memberikan jawaban. Silakan coba lagi.', 'code' => 'empty'];
+    }
+
+    return ['ok' => true, 'text' => ai_clean_reply($text), 'error' => '', 'code' => ''];
+}
+
+/**
+ * AgentRouter via OpenAI Responses API (/responses).
+ * Return ['ok' => bool, 'text' => string, 'error' => string, 'code' => string].
+ */
+function ai_request_agentrouter(string $instructions, string $input): array {
     $payload = [
         'model' => AI_MODEL,
         'instructions' => $instructions,
@@ -148,51 +270,33 @@ function ai_request(string $instructions, string $input): array {
         'X-Title: Roo Code',
     ];
 
-    $ch = curl_init(AI_API_BASE . '/responses');
-    if ($ch === false) {
-        return ['ok' => false, 'text' => '', 'error' => 'Gagal memulai koneksi AI.', 'code' => 'curl_init'];
-    }
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload, JSON_UNESCAPED_UNICODE));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
-    curl_setopt($ch, CURLOPT_TIMEOUT, AI_TIMEOUT_SECONDS);
-    $raw = curl_exec($ch);
-    $curl_error = curl_error($ch);
-    $http = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+    $resp = ai_http_post_json(AI_API_BASE . '/responses', $headers, $payload);
 
-    if ($raw === false) {
-        error_log('ai curl error: ' . $curl_error);
+    if ($resp['raw'] === false) {
+        error_log('ai curl error: ' . $resp['curl_error']);
         return ['ok' => false, 'text' => '', 'error' => 'Koneksi ke layanan AI gagal. Silakan coba lagi.', 'code' => 'curl'];
     }
 
-    $data = json_decode($raw, true);
+    $data = json_decode((string) $resp['raw'], true);
     if (!is_array($data)) {
-        error_log('ai invalid response (HTTP ' . $http . '): ' . substr($raw, 0, 500));
+        error_log('ai invalid response (HTTP ' . $resp['http'] . '): ' . substr((string) $resp['raw'], 0, 500));
         return ['ok' => false, 'text' => '', 'error' => 'Layanan AI mengirim respons tidak valid.', 'code' => 'invalid_json'];
     }
 
-    if ($http < 200 || $http >= 300) {
+    if ($resp['http'] < 200 || $resp['http'] >= 300) {
         $code = (string) ($data['error']['code'] ?? '');
         $upstream = $data['error']['message'] ?? ($data['message'] ?? 'unknown');
-        error_log('ai upstream error (HTTP ' . $http . ', ' . $code . '): ' . $upstream);
+        error_log('ai upstream error (HTTP ' . $resp['http'] . ', ' . $code . '): ' . $upstream);
         return ['ok' => false, 'text' => '', 'error' => 'Layanan AI sedang tidak tersedia. Silakan coba lagi nanti.', 'code' => $code];
     }
 
     $text = ai_extract_text($data);
     if ($text === '') {
-        error_log('ai empty output: ' . substr($raw, 0, 500));
+        error_log('ai empty output: ' . substr((string) $resp['raw'], 0, 500));
         return ['ok' => false, 'text' => '', 'error' => 'AI tidak memberikan jawaban. Silakan coba lagi.', 'code' => 'empty'];
     }
 
-    // Rapikan markdown sederhana agar enak dibaca sebagai teks biasa.
-    $text = preg_replace('/\*\*(.+?)\*\*/u', '$1', $text);
-    $text = str_replace(['**', '__', '`'], '', $text);
-    $text = preg_replace('/^#{1,6}\s*/mu', '', $text);
-
-    return ['ok' => true, 'text' => trim($text), 'error' => '', 'code' => ''];
+    return ['ok' => true, 'text' => ai_clean_reply($text), 'error' => '', 'code' => ''];
 }
 
 /** Bersihkan teks pengguna agar aman dimasukkan ke prompt. */
@@ -283,6 +387,16 @@ function ai_translate(string $text, string $from = 'id', string $to = 'en'): str
  */
 function ai_chat($conn, string $message, array $history, bool $is_logged_in, ?string $user_name): array {
     $instructions = ai_system_instructions($conn, $is_logged_in, $user_name);
+
+    // Gemini: kirim Bahasa Indonesia apa adanya + riwayat percakapan.
+    if (AI_PROVIDER === 'gemini') {
+        $result = ai_request($instructions, $message, $history);
+        if (!$result['ok'] && $result['code'] === 'curl') {
+            sleep(1);
+            $result = ai_request($instructions, $message, $history);
+        }
+        return $result;
+    }
 
     // Ambil satu pertanyaan pengguna sebelumnya sebagai konteks.
     $previous_question = null;

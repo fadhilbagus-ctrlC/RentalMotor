@@ -79,10 +79,6 @@ if (!$booking) {
                     <p style="font-size:12px;color:#7494ec;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">&#128205; Lokasi Pengambilan Motor</p>
                     <p style="font-size:14px;color:#1a1a2e;font-weight:600;margin-bottom:4px;"><?= htmlspecialchars(STORE_NAME) ?></p>
                     <p style="font-size:13px;color:#666;line-height:1.6;"><?= htmlspecialchars(STORE_ADDRESS) ?></p>
-                    <a href="<?= htmlspecialchars(STORE_MAPS_URL) ?>" target="_blank" rel="noopener"
-                       style="display:inline-block;margin-top:8px;font-size:13px;color:#4463b6;font-weight:600;text-decoration:none;">
-                        Buka di Google Maps &#8599;
-                    </a>
                 </div>
             </div>
         </div>

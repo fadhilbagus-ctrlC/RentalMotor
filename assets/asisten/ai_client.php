@@ -116,25 +116,47 @@ function ai_extract_text(array $data): string {
 }
 
 /**
- * POST JSON ke endpoint AI.
+ * POST JSON ke endpoint AI (retry otomatis untuk gangguan sesaat).
+ * Ipresolve dipaksa IPv4: sebagian jaringan punya IPv6 "setengah mati"
+ * yang bikin connect timeout 15 detik dari Apache.
  * Return ['raw' => string|false, 'http' => int, 'curl_error' => string].
  */
-function ai_http_post_json(string $url, array $headers, array $payload): array {
-    $ch = curl_init($url);
-    if ($ch === false) {
-        return ['raw' => false, 'http' => 0, 'curl_error' => 'curl_init failed'];
+function ai_http_post_json(string $url, array $headers, array $payload, int $attempts = 3): array {
+    $last = ['raw' => false, 'http' => 0, 'curl_error' => 'not executed'];
+
+    for ($i = 1; $i <= $attempts; $i++) {
+        $ch = curl_init($url);
+        if ($ch === false) {
+            return ['raw' => false, 'http' => 0, 'curl_error' => 'curl_init failed'];
+        }
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload, JSON_UNESCAPED_UNICODE));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_TIMEOUT, min(60, AI_TIMEOUT_SECONDS));
+        $raw = curl_exec($ch);
+        $curl_error = curl_error($ch);
+        $http = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        $last = ['raw' => $raw, 'http' => $http, 'curl_error' => $curl_error];
+
+        // Retry hanya untuk gangguan sesaat: koneksi gagal / timeout / 5xx.
+        $retryable = ($raw === false) || ($http >= 500 && $http <= 599);
+        if (!$retryable || $i === $attempts) {
+            return $last;
+        }
+        if ($raw === false) {
+            error_log('ai curl retry ' . $i . '/' . $attempts . ': ' . $curl_error);
+        } else {
+            error_log('ai HTTP ' . $http . ' retry ' . $i . '/' . $attempts . ': ' . substr((string) $raw, 0, 200));
+        }
+        sleep($i);
     }
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload, JSON_UNESCAPED_UNICODE));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
-    curl_setopt($ch, CURLOPT_TIMEOUT, AI_TIMEOUT_SECONDS);
-    $raw = curl_exec($ch);
-    $curl_error = curl_error($ch);
-    $http = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    return ['raw' => $raw, 'http' => $http, 'curl_error' => $curl_error];
+
+    return $last;
 }
 
 /** Rapikan markdown sederhana agar enak dibaca sebagai teks biasa. */
@@ -216,7 +238,8 @@ function ai_request_gemini(string $instructions, string $input, array $history =
     if ($resp['http'] < 200 || $resp['http'] >= 300) {
         $code = (string) ($data['error']['code'] ?? ($data['error']['status'] ?? ''));
         $upstream = (string) ($data['error']['message'] ?? 'unknown');
-        error_log('ai gemini upstream error (HTTP ' . $resp['http'] . ', ' . $code . '): ' . $upstream);
+        error_log('ai gemini upstream error (HTTP ' . $resp['http'] . ', ' . $code . '): ' . $upstream
+            . ' | body: ' . substr((string) $resp['raw'], 0, 300));
 
         $message = 'Layanan AI sedang tidak tersedia. Silakan coba lagi nanti.';
         if ($resp['http'] === 429) {
@@ -325,6 +348,7 @@ function ai_http_get(string $url, int $timeout = 10): ?string {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 6);
     curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+    curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json', 'User-Agent: MotorKu/1.0']);
     $raw = curl_exec($ch);
@@ -391,10 +415,22 @@ function ai_chat($conn, string $message, array $history, bool $is_logged_in, ?st
     // Gemini: kirim Bahasa Indonesia apa adanya + riwayat percakapan.
     if (AI_PROVIDER === 'gemini') {
         $result = ai_request($instructions, $message, $history);
-        if (!$result['ok'] && $result['code'] === 'curl') {
-            sleep(1);
-            $result = ai_request($instructions, $message, $history);
+        if ($result['ok']) return $result;
+
+        // Fallback: AgentRouter (gpt-6-astra) memakai prompt berbahasa Inggris
+        // agar tidak kena filter content-blocked.
+        if ($result['code'] !== 'not_configured') {
+            $english = ai_translate($message, 'id', 'en');
+            $fallback_input = ($english !== '' ? $english : ai_wrap_user_text($message))
+                . ' Answer this question in Indonesian.';
+            $fallback = ai_request_agentrouter($instructions, $fallback_input);
+            if ($fallback['ok']) {
+                error_log('ai fallback agentrouter dipakai (gemini code: ' . $result['code'] . ')');
+                return $fallback;
+            }
+            error_log('ai fallback agentrouter gagal: ' . $fallback['code'] . ' - ' . $fallback['error']);
         }
+
         return $result;
     }
 

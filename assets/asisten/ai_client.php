@@ -57,7 +57,7 @@ function ai_system_instructions($conn, bool $is_logged_in, ?string $user_name, ?
     $close = defined('OPERATIONAL_CLOSE') ? OPERATIONAL_CLOSE : '23:00';
     $deadline = defined('RETURN_DEADLINE_TIME') ? RETURN_DEADLINE_TIME : '23:00';
     $fine = defined('FINE_PER_20MIN') ? (int) FINE_PER_20MIN : 10000;
-    $store_name = defined('STORE_NAME') ? STORE_NAME : 'MotorKu Yogyakarta';
+    $store_name = defined('STORE_NAME') ? STORE_NAME : 'MotorKu';
     $store_address = defined('STORE_ADDRESS') ? STORE_ADDRESS : '';
     $store_lat = defined('STORE_LAT') ? (float) STORE_LAT : 0.0;
     $store_lng = defined('STORE_LNG') ? (float) STORE_LNG : 0.0;

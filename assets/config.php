@@ -25,10 +25,10 @@ if (!defined('RETURN_DEADLINE_TIME')) define('RETURN_DEADLINE_TIME', '23:00');
 if (!defined('FINE_PER_20MIN')) define('FINE_PER_20MIN', 10000);
 if (!defined('FINE_BLOCK_MINUTES')) define('FINE_BLOCK_MINUTES', 20);
 
-if (!defined('STORE_NAME')) define('STORE_NAME', 'MotorKu Yogyakarta');
-if (!defined('STORE_ADDRESS')) define('STORE_ADDRESS', 'Jl. Malioboro No. 88, Suryatmajan, Danurejan, Kota Yogyakarta, DIY 55213');
-if (!defined('STORE_LAT')) define('STORE_LAT', -7.79325);
-if (!defined('STORE_LNG')) define('STORE_LNG', 110.36578);
+if (!defined('STORE_NAME')) define('STORE_NAME', 'MotorKu Wonosobo');
+if (!defined('STORE_ADDRESS')) define('STORE_ADDRESS', 'Jl. Raya Wonosobo No. 88, Wonosobo, Jawa Tengah 56311');
+if (!defined('STORE_LAT')) define('STORE_LAT', -7.35952);
+if (!defined('STORE_LNG')) define('STORE_LNG', 109.90283);
 
 if (!function_exists('tgl_jam_id')) {
     function tgl_jam_id($datetime): string {

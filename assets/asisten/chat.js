@@ -18,7 +18,7 @@
     var csrf = root.getAttribute('data-csrf') || '';
     var storeLat = parseFloat(root.getAttribute('data-store-lat'));
     var storeLng = parseFloat(root.getAttribute('data-store-lng'));
-    var storeName = root.getAttribute('data-store-name') || 'MotorKu Yogyakarta';
+    var storeName = root.getAttribute('data-store-name') || 'MotorKu';
 
     var busy = false;
     var typingEl = null;

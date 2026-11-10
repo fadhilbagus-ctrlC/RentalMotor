@@ -127,7 +127,8 @@ body {
 }
 
 .page-riwayat .container,
-.page-profile .container {
+.page-profile .container,
+.page-checkout .container {
     padding-top: 24px;
 }
 

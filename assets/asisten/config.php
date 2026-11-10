@@ -37,7 +37,9 @@ if (!defined('AI_API_BASE')) {
         : 'https://agentrouter.org/v1');
 }
 if (!defined('AI_MODEL')) {
-    define('AI_MODEL', AI_PROVIDER === 'gemini' ? 'gemini-3.8-flash' : 'gpt-6-astra');
+    // Catatan: gemini-3.8-flash terlalu lambat untuk chat real-time (~70 detik/jawaban),
+    // gemini-3.7-flash & model alias sempat hang. 3.6-flash stabil (~3-5 detik).
+    define('AI_MODEL', AI_PROVIDER === 'gemini' ? 'gemini-3.6-flash' : 'gpt-6-astra');
 }
 if (!defined('AI_API_KEY')) {
     define('AI_API_KEY', trim((string) (AI_PROVIDER === 'gemini' ? $ai_gemini_key : $ai_router_key)));

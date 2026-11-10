@@ -34,16 +34,14 @@ if (!$booking) {
 ?>
 
 <div class="container">
-    <p style="margin-bottom:20px; font-size:14px;">
-        <a href="index.php?page=riwayat" style="color:#7494ec; text-decoration:none;">&#8592; Kembali ke Riwayat</a>
-    </p>
+    <a href="index.php?page=riwayat" class="detail-back-link">&#8592; Kembali ke Riwayat</a>
 
     <h2 class="section-title">Checkout Booking #<?= $booking['id'] ?></h2>
 
     <div class="checkout-layout">
 
         <div class="checkout-card">
-            <h2>&#128666; Detail Motor</h2>
+            <h2>Detail Motor</h2>
             <div class="checkout-item">
                 <div class="item-image">
                     <?php if (!empty($booking['image']) && file_exists(__DIR__ . '/../' . $booking['image'])): ?>

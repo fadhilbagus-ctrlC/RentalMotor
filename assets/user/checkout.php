@@ -74,6 +74,16 @@ if (!$booking) {
                     <span style="width:20px;text-align:center;color:#7494ec;">&#128197;</span>
                     <span><strong>Batas Kembali:</strong> <?= date('d M Y', strtotime($booking['return_date'])) ?> <?= str_replace(':', '.', RETURN_DEADLINE_TIME) ?> <small style="color:#888;">(Operasional 05.00 - 23.00 WIB)</small></span>
                 </div>
+
+                <div style="margin-top:16px;padding:14px 16px;border:1px solid #dbe4fb;background:#f5f8ff;border-radius:10px;">
+                    <p style="font-size:12px;color:#7494ec;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">&#128205; Lokasi Pengambilan Motor</p>
+                    <p style="font-size:14px;color:#1a1a2e;font-weight:600;margin-bottom:4px;"><?= htmlspecialchars(STORE_NAME) ?></p>
+                    <p style="font-size:13px;color:#666;line-height:1.6;"><?= htmlspecialchars(STORE_ADDRESS) ?></p>
+                    <a href="<?= htmlspecialchars(STORE_MAPS_URL) ?>" target="_blank" rel="noopener"
+                       style="display:inline-block;margin-top:8px;font-size:13px;color:#4463b6;font-weight:600;text-decoration:none;">
+                        Buka di Google Maps &#8599;
+                    </a>
+                </div>
             </div>
         </div>
 

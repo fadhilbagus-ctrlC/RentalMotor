@@ -7,8 +7,6 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Upload foto profile: return ['ok'=>true,'path'=>?string] (path null = tidak ada file baru).
-// path relatif dari folder assets/, misal 'uploads/profiles/profile_14_....jpg'.
 function upload_profile_photo(array $file, int $user_id): array {
     if (!isset($file['error']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
         return ['ok' => true, 'path' => null];
@@ -24,7 +22,7 @@ function upload_profile_photo(array $file, int $user_id): array {
     if ($file['size'] > 2 * 1024 * 1024) {
         return ['ok' => false, 'msg' => 'Ukuran foto maksimal 2MB'];
     }
-    // Tolak file yang bukan gambar asli (anti file samaran).
+
     $info = @getimagesize($file['tmp_name']);
     if ($info === false) {
         return ['ok' => false, 'msg' => 'File bukan gambar yang valid'];
@@ -45,7 +43,7 @@ function delete_profile_photo(?string $photo): void {
     if (empty($photo)) {
         return;
     }
-    // Keamanan: hanya hapus di dalam folder uploads/profiles.
+
     $base = realpath(__DIR__ . '/uploads/profiles');
     $file = realpath(__DIR__ . '/' . $photo);
     if ($base !== false && $file !== false && strpos($file, $base) === 0 && is_file($file)) {
@@ -97,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($taken) {
                 $_SESSION['msg'] = ['type' => 'error', 'text' => 'Email sudah digunakan user lain'];
             } else {
-                // Proses upload foto (opsional).
+
                 $upload = upload_profile_photo($_FILES['photo'] ?? [], $id);
                 if (!$upload['ok']) {
                     $_SESSION['msg'] = ['type' => 'error', 'text' => $upload['msg']];
@@ -109,13 +107,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (!empty($_POST['password'])) {
                         if (strlen($_POST['password']) < 8) {
                             $_SESSION['msg'] = ['type' => 'error', 'text' => 'Password minimal 8 karakter'];
-                            // Foto baru yang terlanjur terupload dibatalkan agar tidak yatim.
+
                             if ($upload['path'] !== null) {
                                 delete_profile_photo($upload['path']);
                             }
                         } elseif (empty($_POST['old_password']) || !password_verify($_POST['old_password'], $current['password'])) {
                             $_SESSION['msg'] = ['type' => 'error', 'text' => 'Password lama salah'];
-                            // Foto baru yang terlanjur terupload dibatalkan agar tidak yatim.
+
                             if ($upload['path'] !== null) {
                                 delete_profile_photo($upload['path']);
                             }

@@ -9,14 +9,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
-// Validasi CSRF untuk semua aksi POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !csrf_validate($_POST['csrf_token'] ?? null)) {
     $_SESSION['msg'] = ['type' => 'error', 'text' => 'Sesi tidak valid. Silakan muat ulang halaman dan coba lagi.'];
     header("location: index.php?page=users");
     exit();
 }
 
-// ADD USER
 if ($action === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $email = trim($_POST['email'] ?? '');
@@ -68,7 +66,6 @@ if ($action === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
-// EDIT USER
 if ($action === 'edit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = intval($_POST['id'] ?? 0);
     $name = trim($_POST['name'] ?? '');
@@ -122,7 +119,6 @@ if ($action === 'edit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
-// DELETE USER (hanya via POST, GET lama tetap didukung tapi ditolak jika bukan POST)
 if ($action === 'delete') {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         $_SESSION['msg'] = ['type' => 'error', 'text' => 'Metode hapus tidak valid. Gunakan tombol Hapus.'];

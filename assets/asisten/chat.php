@@ -1,9 +1,4 @@
 <?php
-/**
- * Endpoint chat AI MotorKu.
- * POST JSON: { "message": "...", "csrf_token": "..." }
- * Header opsional: X-CSRF-Token
- */
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -24,7 +19,6 @@ session_start();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/ai_client.php';
 
-// Reasoning model bisa butuh waktu lebih lama dari batas default.
 @set_time_limit(AI_TIMEOUT_SECONDS + 30);
 
 $raw = file_get_contents('php://input');
@@ -47,7 +41,6 @@ if (mb_strlen($message) > AI_MAX_INPUT_CHARS) {
     ai_json(422, ['ok' => false, 'error' => 'Pesan terlalu panjang (maksimal ' . AI_MAX_INPUT_CHARS . ' karakter).']);
 }
 
-// Rate limit per session.
 $now = time();
 $times = $_SESSION['ai_chat_times'] ?? [];
 if (!is_array($times)) $times = [];

@@ -10,12 +10,6 @@ loginBtn.addEventListener('click', () => {
     container.classList.remove('active');
 });
 
-// ---------------------------------------------------------------------------
-// Deteksi keyboard virtual di HP.
-// Saat keyboard terbuka, tinggi layar yang terlihat menyusut. Container
-// mengikuti tinggi tersebut agar area form bisa di-scroll dan tombol Register
-// tidak menabrak panel toggle-right di bawahnya.
-// ---------------------------------------------------------------------------
 const isMobile = window.matchMedia('(max-width: 850px)');
 const viewport = window.visualViewport;
 
@@ -26,7 +20,6 @@ const inputFocused = () => {
 
 const visibleHeight = () => viewport ? viewport.height : window.innerHeight;
 
-// Tinggi layar "normal" saat keyboard tidak terbuka.
 let baselineHeight = Math.max(window.innerHeight, visibleHeight());
 
 const refreshBaseline = () => {
@@ -43,13 +36,12 @@ const syncViewport = () => {
     const height = visibleHeight();
     document.documentElement.style.setProperty('--vv-height', height + 'px');
 
-    // Selisih > 120px biasanya berarti keyboard terbuka (bukan address bar).
     const keyboardOpen = (baselineHeight - height) > 120;
     document.body.classList.toggle('keyboard-open', keyboardOpen);
 };
 
 const handleResize = () => {
-    // Jangan perbarui baseline saat input sedang fokus (keyboard terbuka).
+
     if (!inputFocused()) {
         refreshBaseline();
     }

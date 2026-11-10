@@ -1,5 +1,5 @@
 <?php
-// Profile page - tampilkan tampilan guest jika belum login
+
 if (!$is_logged_in) {
 ?>
 <div class="container">
@@ -15,7 +15,6 @@ if (!$is_logged_in) {
     return;
 }
 
-// Profile page - user sudah login
 $stmt = $conn->prepare("SELECT * FROM users WHERE id=?");
 if ($stmt === false) {
     error_log("profile prepare failed: " . $conn->error);
@@ -37,7 +36,7 @@ if (!$profile) {
     <h2 class="section-title">Profile Saya</h2>
 
     <div class="profile-layout">
-        <!-- PROFILE CARD -->
+
         <div class="profile-card">
             <?php $ucard_photo = (!empty($profile['profile_photo']) && is_file(__DIR__ . '/../' . $profile['profile_photo'])) ? '../' . $profile['profile_photo'] : null; ?>
             <div class="profile-avatar"><?php if ($ucard_photo): ?><img src="<?= htmlspecialchars($ucard_photo) ?>" alt="Foto profile"><?php else: ?><?= strtoupper(substr($profile['name'], 0, 1)) ?><?php endif; ?></div>
@@ -48,7 +47,6 @@ if (!$profile) {
             </p>
         </div>
 
-        <!-- FORM EDIT -->
         <div class="profile-form">
             <h2>Edit Profile</h2>
             <form action="../process_profile.php" method="POST" enctype="multipart/form-data">

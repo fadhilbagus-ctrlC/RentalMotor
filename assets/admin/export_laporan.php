@@ -76,7 +76,6 @@ if ($output === false) {
     exit;
 }
 
-// BOM agar Excel membaca UTF-8 dengan benar
 fwrite($output, "\xEF\xBB\xBF");
 fputcsv($output, [
     'ID Booking',

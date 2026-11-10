@@ -10,7 +10,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
-// Validasi CSRF untuk semua aksi POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !csrf_validate($_POST['csrf_token'] ?? null)) {
     $_SESSION['msg'] = ['type' => 'error', 'text' => 'Sesi tidak valid. Silakan muat ulang halaman dan coba lagi.'];
     $back = in_array($action, ['confirm', 'cancel'], true) ? 'index.php?page=riwayat' : 'index.php?page=katalog';
@@ -18,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !csrf_validate($_POST['csrf_token']
     exit();
 }
 
-// Helper: prepare aman, gagal -> redirect dengan pesan, bukan fatal
 function db_prepare_or_redirect($conn, string $sql, string $redirect) {
     $stmt = $conn->prepare($sql);
     if ($stmt === false) {
@@ -32,21 +30,19 @@ function db_prepare_or_redirect($conn, string $sql, string $redirect) {
 
 switch ($action) {
     case 'add':
-        // Proses booking baru
+
         $product_id = intval($_POST['product_id'] ?? 0);
         $pickup_date = trim($_POST['pickup_date'] ?? '');
         $return_date = trim($_POST['return_date'] ?? '');
-        // JANGAN percaya price_per_day dari client, ambil dari DB
+
         $today = date('Y-m-d');
 
-        // Validasi
         if (empty($pickup_date) || empty($return_date) || $product_id <= 0) {
             $_SESSION['msg'] = ['type' => 'error', 'text' => 'Semua field harus diisi.'];
             header("location: index.php?page=detail&id=$product_id");
             exit();
         }
 
-        // Validasi jam operasional 05.00 - 23.00 (booking di luar jam dikenakan penolakan)
         $now_time = date('H:i');
         if ($now_time < OPERATIONAL_OPEN || $now_time > OPERATIONAL_CLOSE) {
             $_SESSION['msg'] = ['type' => 'error', 'text' => 'Booking hanya bisa dilakukan pada jam operasional 05.00 - 23.00 WIB. Sekarang ' . date('H.i') . '.'];
@@ -54,7 +50,6 @@ switch ($action) {
             exit();
         }
 
-        // Validasi format tanggal Y-m-d
         $d_pickup = DateTime::createFromFormat('Y-m-d', $pickup_date);
         $d_return = DateTime::createFromFormat('Y-m-d', $return_date);
         if (!$d_pickup || !$d_return || $d_pickup->format('Y-m-d') !== $pickup_date || $d_return->format('Y-m-d') !== $return_date) {
@@ -75,7 +70,6 @@ switch ($action) {
             exit();
         }
 
-        // Hitung jumlah hari
         $d1 = new DateTime($pickup_date);
         $d2 = new DateTime($return_date);
         $total_days = (int) $d2->diff($d1)->days;
@@ -84,7 +78,6 @@ switch ($action) {
             $total_days = 1;
         }
 
-        // Cek ketersediaan motor + ambil harga asli dari DB
         $stmt = db_prepare_or_redirect($conn, "SELECT status, price_per_day FROM products WHERE id=?", "index.php?page=katalog");
         $stmt->bind_param("i", $product_id);
         $stmt->execute();
@@ -101,7 +94,6 @@ switch ($action) {
         $price_per_day = (int) $product['price_per_day'];
         $total_price = $total_days * $price_per_day;
 
-        // Cek overlap booking aktif untuk motor yang sama
         $stmt = db_prepare_or_redirect($conn, "
             SELECT id FROM bookings
             WHERE product_id = ?
@@ -121,7 +113,6 @@ switch ($action) {
             exit();
         }
 
-        // Insert booking
         $stmt = db_prepare_or_redirect($conn, "
             INSERT INTO bookings (user_id, product_id, booking_date, pickup_date, return_date, total_days, total_price, status)
             VALUES (?, ?, CURDATE(), ?, ?, ?, ?, 'pending')
@@ -137,7 +128,7 @@ switch ($action) {
         break;
 
     case 'confirm':
-        // Konfirmasi booking (bayar via e-wallet)
+
         $booking_id = intval($_POST['booking_id'] ?? 0);
         $payment_method = strtolower(trim($_POST['payment_method'] ?? ''));
         $payment_number = trim($_POST['payment_number'] ?? '');
@@ -176,7 +167,6 @@ switch ($action) {
 
         require_once __DIR__ . '/payment_gateway.php';
 
-        // Reuse tagihan yang sudah ada agar klik ganda tidak membuat invoice baru.
         if (!empty($booking['payment_ref'])) {
             $existing = xendit_invoice_by_ref($booking['payment_ref']);
             if (is_array($existing)) {
@@ -202,7 +192,7 @@ switch ($action) {
                     exit();
                 }
             } elseif (!empty($booking['payment_url'])) {
-                // Verifikasi sementara gagal: jangan buat invoice baru, arahkan ke tagihan lama.
+
                 $_SESSION['msg'] = ['type' => 'info', 'text' => 'Tagihan pembayaran sudah dibuat. Silakan selesaikan pembayaran.'];
                 header("location: " . $booking['payment_url']);
                 exit();
@@ -213,7 +203,6 @@ switch ($action) {
             }
         }
 
-        // Cek overlap dengan booking lain (selain booking ini)
         $stmt = db_prepare_or_redirect($conn, "
             SELECT id FROM bookings
             WHERE product_id = ?
@@ -234,8 +223,6 @@ switch ($action) {
             exit();
         }
 
-        // Buat tagihan via gateway Xendit (invoice). Booking TETAP pending;
-        // konfirmasi terjadi setelah pembayaran via return page / webhook.
         $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         $base = $scheme . '://' . $host . rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/pkk/assets/user'), '/');
@@ -255,7 +242,6 @@ switch ($action) {
         $payment_url = $charge['url'];
         $old_ref = (string) ($booking['payment_ref'] ?? '');
 
-        // Compare-and-swap: cegah dua request bersamaan membuat invoice berbeda.
         $stmt = db_prepare_or_redirect($conn, "UPDATE bookings SET payment_method=?, payment_number=?, payment_ref=?, payment_url=? WHERE id=? AND status='pending' AND (payment_ref IS NULL OR payment_ref=?)", "index.php?page=riwayat");
         $stmt->bind_param("ssssis", $payment_method, $payment_number, $payment_ref, $payment_url, $booking_id, $old_ref);
         $stmt->execute();
@@ -263,7 +249,7 @@ switch ($action) {
         $stmt->close();
 
         if ($updated === 0) {
-            // Request lain lebih dulu menyimpan tagihan; ikuti tagihan yang tersimpan.
+
             $stmt = db_prepare_or_redirect($conn, "SELECT payment_url FROM bookings WHERE id=? AND user_id=?", "index.php?page=riwayat");
             $stmt->bind_param("ii", $booking_id, $_SESSION['user_id']);
             $stmt->execute();
@@ -286,7 +272,7 @@ switch ($action) {
         break;
 
     case 'cancel':
-        // Batalkan booking
+
         $booking_id = intval($_POST['booking_id'] ?? 0);
 
         $stmt = db_prepare_or_redirect($conn, "
@@ -305,13 +291,11 @@ switch ($action) {
             exit();
         }
 
-        // Update status booking → cancelled
         $stmt = db_prepare_or_redirect($conn, "UPDATE bookings SET status='cancelled' WHERE id=?", "index.php?page=riwayat");
         $stmt->bind_param("i", $booking_id);
         $stmt->execute();
         $stmt->close();
 
-        // Kembalikan motor ke available hanya jika tidak ada booking aktif lain
         $stmt = db_prepare_or_redirect($conn, "
             SELECT id FROM bookings
             WHERE product_id = ? AND id != ? AND status IN ('pending','confirmed','active')

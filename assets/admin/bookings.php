@@ -1,9 +1,4 @@
 <?php
-// ============================================
-// BOOKINGS PAGE (partial, di-include index.php)
-// Tanggung jawab: tampilan daftar booking saja
-// Variabel tersedia: $conn
-// ============================================
 
 $filter_q = trim($_GET['q'] ?? '');
 $filter_bstatus = trim($_GET['bstatus'] ?? '');
@@ -28,7 +23,6 @@ if ($filter_bstatus !== '' && in_array($filter_bstatus, ['pending', 'confirmed',
     $bind_types .= "s";
 }
 
-// Total baris untuk pagination
 $stmt = $conn->prepare("
     SELECT COUNT(*) as total FROM bookings b
     JOIN users u ON b.user_id = u.id
@@ -51,7 +45,6 @@ if ($stmt === false) {
     $stmt->close();
     $total_pages = max(1, (int) ceil($total_rows / $per_page));
 
-    // Data halaman ini
     $stmt = $conn->prepare("
         SELECT b.*, u.name AS user_name, u.email AS user_email,
                p.name AS product_name, p.brand AS product_brand, p.image AS product_image
@@ -85,7 +78,6 @@ $booking_label = [
         <h2 style="margin:0;border:0;padding:0;">Kelola Booking (<?= $total_rows ?>)</h2>
     </div>
 
-    <!-- FILTER -->
     <form method="GET" action="" style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
         <input type="hidden" name="page" value="bookings">
         <input type="text" name="q" placeholder="Cari user/motor..." value="<?= htmlspecialchars($filter_q) ?>" style="padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
@@ -196,7 +188,6 @@ $booking_label = [
         </table>
     </div>
 
-    <!-- PAGINATION -->
     <?php if ($total_pages > 1): ?>
     <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
         <?php for ($p = 1; $p <= $total_pages; $p++): ?>

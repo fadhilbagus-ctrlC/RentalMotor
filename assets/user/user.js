@@ -1,4 +1,3 @@
-// Kalkulator harga booking
 function hitungHarga() {
     const pickupDate = document.getElementById('pickup_date');
     const returnDate = document.getElementById('return_date');
@@ -10,14 +9,12 @@ function hitungHarga() {
     const returnD = returnDate.value;
     const price = parseInt(pricePerDay.value);
 
-    // Set minimum return date = pickup date + 1
     if (pickup) {
         const nextDay = new Date(pickup);
         nextDay.setDate(nextDay.getDate() + 1);
         returnDate.min = nextDay.toISOString().split('T')[0];
     }
 
-    // Update display pickup date
     const displayPickup = document.getElementById('display_pickup');
     const displayReturn = document.getElementById('display_return');
     const displayDays = document.getElementById('display_days');
@@ -41,7 +38,6 @@ function hitungHarga() {
         if (displayReturn) displayReturn.textContent = '-';
     }
 
-    // Hitung jumlah hari
     if (pickup && returnD) {
         const pDate = new Date(pickup);
         const rDate = new Date(returnD);
@@ -54,7 +50,6 @@ function hitungHarga() {
             if (displayDays) displayDays.textContent = diffDays + ' hari';
             if (displayTotal) displayTotal.textContent = 'Rp ' + total.toLocaleString('id-ID');
 
-            // Enable button
             const btn = document.getElementById('btnBooking');
             if (btn) btn.disabled = false;
         } else {
@@ -70,7 +65,6 @@ function hitungHarga() {
     }
 }
 
-// Filter tabel riwayat booking lewat stat card
 function initBookingFilters() {
     const cards = Array.from(document.querySelectorAll('.stat-card[data-filter]'));
     if (!cards.length) return;
@@ -147,9 +141,8 @@ function initBookingFilters() {
     applyFilter('all');
 }
 
-// Inisialisasi saat halaman load
 document.addEventListener('DOMContentLoaded', function() {
-    // Jalankan hitungHarga jika form booking ada
+
     if (document.getElementById('bookingForm')) {
         hitungHarga();
     }

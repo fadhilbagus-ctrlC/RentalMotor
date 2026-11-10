@@ -1,5 +1,5 @@
 <?php
-// Riwayat booking - harus login dulu
+
 if (!$is_logged_in) {
 ?>
 <div class="container">
@@ -15,7 +15,6 @@ if (!$is_logged_in) {
     return;
 }
 
-// Riwayat booking user
 $user_id = (int) $_SESSION['user_id'];
 $stmt = $conn->prepare("
     SELECT b.*, p.name, p.brand, p.image, p.price_per_day
@@ -39,7 +38,6 @@ if ($bookings === null) {
     return;
 }
 
-// Statistik
 $stmt2 = $conn->prepare("
     SELECT
         COUNT(*) as total,
@@ -66,7 +64,6 @@ if ($stmt2 === false) {
 <div class="container">
     <h2 class="section-title">Booking Saya</h2>
 
-    <!-- STATISTIK -->
     <div class="stat-cards" id="statCards">
         <button type="button" class="stat-card is-active" data-filter="all" aria-pressed="true">
             <div class="stat-icon blue">&#128203;</div>
@@ -99,7 +96,6 @@ if ($stmt2 === false) {
     </div>
     <p class="filter-info" id="filterInfo" aria-live="polite">Menampilkan semua booking.</p>
 
-    <!-- TABEL RIWAYAT -->
     <?php if ($bookings->num_rows > 0): ?>
     <div class="table-wrapper">
         <table id="bookingTable">

@@ -2,10 +2,8 @@
 session_start();
 require_once __DIR__ . '/../config.php';
 
-// Cek status login (guest atau user)
 $is_logged_in = isset($_SESSION['user_id']) && $_SESSION['role'] === 'user';
 
-// Get user profile jika sudah login
 $user = null;
 if ($is_logged_in) {
     $stmt = $conn->prepare("SELECT * FROM users WHERE id=?");
@@ -20,23 +18,19 @@ if ($is_logged_in) {
     }
 }
 
-// Flash message
 $msg = $_SESSION['msg'] ?? null;
 unset($_SESSION['msg']);
 
-// Penanda baru saja logout (dari logout.php?logged_out=1) agar jelas bukan halaman login
 if (!$msg && !$is_logged_in && ($_GET['logged_out'] ?? '') === '1') {
     $msg = ['type' => 'success', 'text' => 'Berhasil logout. Selamat datang sebagai Guest.'];
 }
 
-// Route pages
 $page = $_GET['page'] ?? 'katalog';
 $valid_pages = ['katalog', 'detail', 'checkout', 'riwayat', 'profile', 'struk', 'bayar_kembali'];
 if (!in_array($page, $valid_pages)) {
     $page = 'katalog';
 }
 
-// Flash markup: overlay dari navbar di halaman katalog, alur normal di halaman lain
 $flash_class = $page === 'katalog' ? 'flash-wrap' : 'flash-wrap flash-flow';
 $flash_html = '';
 if ($msg) {
@@ -57,7 +51,6 @@ if ($msg) {
 </head>
 <body class="page-<?= htmlspecialchars($page) ?>">
 
-<!-- NAVBAR -->
 <nav class="navbar">
     <a href="index.php" class="navbar-brand">
         <img src="../login/logo-white.png" alt="MotorKu" class="navbar-logo">
@@ -91,12 +84,10 @@ if ($msg) {
 <?= $flash_html ?>
 <?php endif; ?>
 
-<!-- PAGE CONTENT -->
 <div class="page-content">
 <?php include __DIR__ . '/' . $page . '.php'; ?>
 </div>
 
-<!-- FOOTER -->
 <footer class="footer">
     <p>&copy; MotorKu - Rental Motor Terpercaya</p>
 </footer>

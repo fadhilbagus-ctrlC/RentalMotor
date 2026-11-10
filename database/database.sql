@@ -10,8 +10,6 @@ CREATE TABLE `users` (
     UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Sample Users (password: bcrypt hash, password asli: '123' untuk keduanya)
--- Ganti hash ini di production dan jangan commit password asli.
 INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`) VALUES
 (1, 'Admin', 'admin@gmail.com', '$2y$10$BHL9ImTcXcK29L.yocMVV.BQM195d61ujMMMVQ3iHpmCnPex33mDW', 'admin'),
 (2, 'User', 'user@gmail.com', '$2y$10$BHL9ImTcXcK29L.yocMVV.BQM195d61ujMMMVQ3iHpmCnPex33mDW', 'user');

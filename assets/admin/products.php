@@ -1,8 +1,4 @@
 <?php
-// PRODUCTS PAGE (partial, di-include index.php)
-// Tanggung jawab: tampilan kelola motor saja
-// Variabel tersedia: $conn
-
 
 $filter_search = trim($_GET['s'] ?? '');
 $filter_status = trim($_GET['status'] ?? '');
@@ -46,7 +42,6 @@ $status_label = ['available' => 'Tersedia', 'rented' => 'Disewa', 'maintenance' 
         <button class="btn btn-primary" onclick="document.getElementById('addProductModal').classList.add('active')">+ Tambah Motor</button>
     </div>
 
-    <!-- FILTER -->
     <form method="GET" action="" style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
         <input type="hidden" name="page" value="products">
         <input type="text" name="s" placeholder="Cari nama/brand..." value="<?= htmlspecialchars($filter_search) ?>" style="padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
@@ -111,7 +106,6 @@ $status_label = ['available' => 'Tersedia', 'rented' => 'Disewa', 'maintenance' 
     </div>
 </div>
 
-<!-- ADD MODAL -->
 <div class="modal-overlay" id="addProductModal">
     <div class="modal">
         <h2>Tambah Motor</h2>
@@ -172,7 +166,6 @@ $status_label = ['available' => 'Tersedia', 'rented' => 'Disewa', 'maintenance' 
     </div>
 </div>
 
-<!-- EDIT MODAL -->
 <div class="modal-overlay" id="editProductModal">
     <div class="modal">
         <h2>Edit Motor</h2>

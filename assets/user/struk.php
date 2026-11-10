@@ -1,5 +1,5 @@
 <?php
-// Struk laporan hasil pembelian - login wajib, hanya pemilik, status non-pending (lunas)
+
 if (!$is_logged_in) {
     $_SESSION['msg'] = ['type' => 'error', 'text' => 'Silahkan login terlebih dahulu untuk melihat struk.'];
     header("location: index.php?page=katalog");

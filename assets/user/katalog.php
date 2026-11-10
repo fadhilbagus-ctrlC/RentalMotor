@@ -1,5 +1,5 @@
 <?php
-// Query motor tersedia (prepared statement, anti SQL injection)
+
 $search = trim($_GET['search'] ?? '');
 $filter_brand = trim($_GET['brand'] ?? '');
 $filter_type = trim($_GET['type'] ?? '');
@@ -39,7 +39,6 @@ if ($stmt === false) {
     $stmt->execute();
     $products = $stmt->get_result();
 
-    // Get brands & types for filter
     $brands = $conn->query("SELECT DISTINCT brand FROM products WHERE status='available' ORDER BY brand");
     $types = $conn->query("SELECT DISTINCT type FROM products WHERE status='available' ORDER BY type");
     if ($brands === false) {
@@ -55,7 +54,6 @@ if ($products === false) {
 }
 ?>
 
-<!-- HERO -->
 <section class="hero-shell">
     <div class="hero-banner">
         <div class="hero-copy">
@@ -145,7 +143,7 @@ if ($products === false) {
 </section>
 
 <div class="container">
-    <!-- PRODUCT GRID -->
+
     <h2 class="section-title" id="motor-tersedia">Motor Tersedia</h2>
 
     <?php if ($products->num_rows > 0): ?>

@@ -1,6 +1,5 @@
 <?php
-// PROCESS PRODUCT (Admin)
-// Tanggung jawab: CRUD tabel products saja
+
 session_start();
 require_once __DIR__ . '/../config.php';
 
@@ -12,7 +11,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 $allowed_status = ['available', 'rented', 'maintenance'];
 
-//UPLOAD GAMBAR
 function upload_product_image(array $file): array {
     if (!isset($file['error']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
         return ['ok' => true, 'path' => null];
@@ -29,7 +27,7 @@ function upload_product_image(array $file): array {
     if ($file['size'] > 2 * 1024 * 1024) {
         return ['ok' => false, 'msg' => 'Ukuran gambar maksimal 2MB'];
     }
-    // Tolak file yang bukan gambar asli (anti file samaran).
+
     $info = @getimagesize($file['tmp_name']);
     if ($info === false) {
         return ['ok' => false, 'msg' => 'File bukan gambar yang valid'];
@@ -65,12 +63,10 @@ function redirect_products(string $type, string $text): void {
     exit();
 }
 
-// Validasi CSRF untuk semua aksi POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !csrf_validate($_POST['csrf_token'] ?? null)) {
     redirect_products('error', 'Sesi tidak valid. Silakan muat ulang halaman dan coba lagi.');
 }
 
-//ADD PRODUCT
 if ($action === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $name          = trim($_POST['name'] ?? '');
     $brand         = trim($_POST['brand'] ?? '');
@@ -110,7 +106,6 @@ if ($action === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect_products('success', 'Motor berhasil ditambahkan');
 }
 
-// EDIT PRODUCT
 if ($action === 'edit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $id            = intval($_POST['id'] ?? 0);
     $name          = trim($_POST['name'] ?? '');
@@ -166,7 +161,6 @@ if ($action === 'edit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect_products('success', 'Motor berhasil diupdate');
 }
 
-// DELETE PRODUCT 
 if ($action === 'delete') {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         redirect_products('error', 'Metode hapus tidak valid. Gunakan tombol Hapus.');

@@ -1,10 +1,5 @@
 <?php
-// ============================================
-// PROCESS BOOKING (Admin)
-// Tanggung jawab: update status booking saja
-// Alur valid: pending->confirmed/cancelled,
-// confirmed->active/cancelled, active->completed/cancelled
-// ============================================
+
 session_start();
 require_once __DIR__ . '/../config.php';
 
@@ -21,7 +16,6 @@ function redirect_bookings(string $type, string $text): void {
     exit();
 }
 
-// Validasi CSRF untuk semua aksi POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !csrf_validate($_POST['csrf_token'] ?? null)) {
     redirect_bookings('error', 'Sesi tidak valid. Silakan muat ulang halaman dan coba lagi.');
 }
@@ -48,28 +42,27 @@ if (!$booking) {
 $current = $booking['status'];
 $product_id = (int) $booking['product_id'];
 
-// Tentukan status tujuan berdasarkan aksi
 $target = '';
 switch ($action) {
-    case 'confirm':  // pending -> confirmed (motor jadi rented)
+    case 'confirm':
         if ($current !== 'pending') {
             redirect_bookings('error', 'Hanya booking pending yang bisa dikonfirmasi');
         }
         $target = 'confirmed';
         break;
-    case 'activate': // confirmed -> active
+    case 'activate':
         if ($current !== 'confirmed') {
             redirect_bookings('error', 'Hanya booking confirmed yang bisa diaktifkan');
         }
         $target = 'active';
         break;
-    case 'complete': // active -> completed (motor kembali available)
+    case 'complete':
         if ($current !== 'active') {
             redirect_bookings('error', 'Hanya booking active yang bisa diselesaikan');
         }
         $target = 'completed';
         break;
-    case 'cancel':   // pending/confirmed/active -> cancelled
+    case 'cancel':
         if (!in_array($current, ['pending', 'confirmed', 'active'], true)) {
             redirect_bookings('error', 'Booking tidak bisa dibatalkan');
         }
@@ -79,7 +72,6 @@ switch ($action) {
         redirect_bookings('error', 'Aksi tidak valid');
 }
 
-// Update status booking (dengan hitungan denda bila complete)
 if ($target === 'completed') {
     $actual = date('Y-m-d H:i:s');
     $deadline_str = ($booking['return_date'] ?? date('Y-m-d')) . ' ' . RETURN_DEADLINE_TIME . ':00';
@@ -96,14 +88,13 @@ if ($target === 'completed') {
     $stmt->close();
 }
 
-// Sinkronkan status motor
 if ($target === 'confirmed' || $target === 'active') {
     $stmt = $conn->prepare("UPDATE products SET status='rented' WHERE id=?");
     $stmt->bind_param("i", $product_id);
     $stmt->execute();
     $stmt->close();
 } elseif ($target === 'completed' || $target === 'cancelled') {
-    // Kembalikan ke available hanya jika tidak ada booking aktif lain
+
     $stmt = $conn->prepare("
         SELECT id FROM bookings
         WHERE product_id=? AND id!=? AND status IN ('pending','confirmed','active')

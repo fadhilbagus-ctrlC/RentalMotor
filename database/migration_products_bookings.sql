@@ -1,7 +1,3 @@
--- Migrasi: tabel products & bookings untuk MotorKu
--- Database: login_db (users sudah ada, id INT UNSIGNED)
--- Jalankan: mysql -u root login_db < migration_products_bookings.sql
-
 CREATE TABLE IF NOT EXISTS `products` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL,
@@ -42,7 +38,6 @@ CREATE TABLE IF NOT EXISTS `bookings` (
     CONSTRAINT `fk_bookings_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Pembayaran e-wallet untuk DB lama (idempoten, hanya jalan bila kolom belum ada)
 SET @has_pm := (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'bookings' AND COLUMN_NAME = 'payment_method');
 SET @sql_pm := IF(@has_pm = 0, 'ALTER TABLE `bookings` ADD COLUMN `payment_method` VARCHAR(20) NULL DEFAULT NULL AFTER `status`', 'SELECT 1');
 PREPARE stmt_pm FROM @sql_pm; EXECUTE stmt_pm; DEALLOCATE PREPARE stmt_pm;
@@ -74,8 +69,6 @@ SET @has_pp := (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHE
 SET @sql_pp := IF(@has_pp = 0, 'ALTER TABLE `users` ADD COLUMN `profile_photo` VARCHAR(255) NULL DEFAULT NULL AFTER `role`', 'SELECT 1');
 PREPARE stmt_pp FROM @sql_pp; EXECUTE stmt_pp; DEALLOCATE PREPARE stmt_pp;
 
--- Contoh data agar katalog tidak kosong (tanpa tahun produksi, angka CC dipertahankan)
--- Idempoten: baris yang namanya sudah ada tidak diinsert ulang
 INSERT INTO `products` (`name`, `brand`, `type`, `price_per_day`, `price_per_week`, `image`, `description`, `status`)
 SELECT `seed`.* FROM (
     SELECT 'Honda Beat' AS `name`, 'Honda' AS `brand`, 'Matic' AS `type`, 75000 AS `price_per_day`, 450000 AS `price_per_week`, 'uploads/products/honda-beat.webp' AS `image`, 'Motor matic irit, cocok untuk harian.' AS `description`, 'available' AS `status`
@@ -90,7 +83,6 @@ SELECT `seed`.* FROM (
 LEFT JOIN `products` AS `p` ON `p`.`name` = `seed`.`name`
 WHERE `p`.`id` IS NULL;
 
--- Samakan gambar produk lama dengan file gambar yang tersedia.
 UPDATE `products` SET `image` = 'uploads/products/honda-beat.webp' WHERE `name` = 'Honda Beat' AND `brand` = 'Honda';
 UPDATE `products` SET `image` = 'uploads/products/yamaha-nmax.webp' WHERE `name` = 'Yamaha NMAX' AND `brand` = 'Yamaha';
 UPDATE `products` SET `image` = 'uploads/products/honda-vario-160.webp' WHERE `name` = 'Honda Vario 160' AND `brand` = 'Honda';

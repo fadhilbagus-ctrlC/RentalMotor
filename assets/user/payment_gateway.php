@@ -1,22 +1,9 @@
 <?php
-// Helper pembayaran e-wallet via Xendit Invoice API (Tahap 2 - aktif).
-//
-// Cara kerja:
-//  - confirm (process_booking.php) memanggil create_ewallet_charge() -> invoice Xendit
-//    dibuat, booking TETAP pending, user diarahkan ke invoice_url (halaman bayar Xendit).
-//  - Setelah bayar, Xendit redirect browser ke halaman bayar_kembali + mengirim
-//    webhook ke process_payment_callback.php -> booking confirmed + motor rented.
-//  - Kunci dibaca dari env (XENDIT_SECRET_KEY, XENDIT_CALLBACK_TOKEN),
-//    fallback file lokal C:\Laragon\etc\xendit_secrets.php (TIDAK di repo).
-//
-// Catatan keamanan: JANGAN commit secret key ke repo. Setelah pengujian,
-// revoke + generate ulang key di dashboard Xendit bila key sempat terekspos.
 
-define('PAYMENT_MODE', 'xendit'); // 'local' | 'xendit'
+define('PAYMENT_MODE', 'xendit');
 define('PAYMENT_METHODS', ['dana', 'gopay', 'shopeepay', 'ovo', 'qris']);
 define('XENDIT_API_BASE', 'https://api.xendit.co');
 
-// Muat secret lokal bila env belum diset (dev only, file di luar docroot & repo).
 if (!getenv('XENDIT_SECRET_KEY') || !getenv('XENDIT_CALLBACK_TOKEN')) {
     $local_secrets = 'C:\\Laragon\\etc\\xendit_secrets.php';
     if (is_file($local_secrets)) {
@@ -36,7 +23,6 @@ function payment_is_configured(): bool {
     return payment_secret() !== '' && function_exists('curl_init');
 }
 
-// Panggil API Xendit. Return ['http' => int, 'data' => mixed, 'error' => ?string].
 function xendit_request(string $method, string $path, ?array $body = null): array {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, XENDIT_API_BASE . $path);
@@ -63,14 +49,11 @@ function xendit_request(string $method, string $path, ?array $body = null): arra
     return ['http' => $http, 'data' => $data, 'error' => $http >= 400 ? $raw : null];
 }
 
-// Petakan metode lokal -> channel invoice Xendit.
 function xendit_channel_for(string $method): ?string {
     $map = ['dana' => 'DANA', 'gopay' => 'GOPAY', 'shopeepay' => 'SHOPEEPAY', 'ovo' => 'OVO', 'qris' => 'QRIS'];
     return $map[$method] ?? null;
 }
 
-// Buat tagihan invoice Xendit. Return ['ref'=>external_id, 'url'=>invoice_url, 'invoice_id'=>id]
-// atau ['error'=>pesan] bila gagal.
 function create_ewallet_charge(array $booking, string $method, string $number, array $customer, string $success_url, string $failure_url): array {
     if (!payment_is_configured()) {
         return ['error' => 'Gateway belum dikonfigurasi (secret key / curl).'];
@@ -96,7 +79,7 @@ function create_ewallet_charge(array $booking, string $method, string $number, a
         $payload['payment_methods'] = [$channel];
     }
     $res = xendit_request('POST', '/v2/invoices', $payload);
-    // Channel tidak didukung akun ini -> coba lagi tanpa batasan channel.
+
     if (($res['http'] === 400) && isset($payload['payment_methods'])) {
         unset($payload['payment_methods']);
         $res = xendit_request('POST', '/v2/invoices', $payload);
@@ -108,7 +91,6 @@ function create_ewallet_charge(array $booking, string $method, string $number, a
     return ['ref' => $ref, 'url' => $res['data']['invoice_url'], 'invoice_id' => $res['data']['id'] ?? null];
 }
 
-// Ambil status invoice terbaru berdasarkan external_id. Return array invoice | null.
 function xendit_invoice_by_ref(string $ref): ?array {
     $res = xendit_request('GET', '/v2/invoices?external_id=' . urlencode($ref) . '&limit=1');
     if ($res['http'] < 200 || $res['http'] >= 300 || !is_array($res['data'])) {
@@ -118,7 +100,6 @@ function xendit_invoice_by_ref(string $ref): ?array {
     return is_array($item) ? $item : null;
 }
 
-// Ambil invoice resmi berdasarkan invoice id. Return array invoice | null.
 function xendit_invoice_by_id(string $invoice_id): ?array {
     if ($invoice_id === '') {
         return null;
@@ -130,8 +111,6 @@ function xendit_invoice_by_id(string $invoice_id): ?array {
     return $res['data'];
 }
 
-// Konfirmasi booking yang sudah lunas (idempoten: hanya bila masih pending).
-// Return true bila baris berubah menjadi confirmed.
 function confirm_booking_paid($conn, int $booking_id, int $product_id, ?string $paid_at = null): bool {
     $stmt = $conn->prepare("UPDATE bookings SET status='confirmed', paid_at=? WHERE id=? AND status='pending'");
     if ($stmt === false) {
@@ -154,7 +133,6 @@ function confirm_booking_paid($conn, int $booking_id, int $product_id, ?string $
     return $changed;
 }
 
-// Verifikasi callback Xendit (dipakai process_payment_callback.php).
 function verify_gateway_callback(string $raw_body, array $headers): bool {
     $token = getenv('XENDIT_CALLBACK_TOKEN');
     if (!is_string($token) || $token === '') {

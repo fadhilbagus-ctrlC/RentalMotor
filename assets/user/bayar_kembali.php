@@ -1,7 +1,5 @@
 <?php
-// Halaman kembali dari pembayaran Xendit (success_redirect_url).
-// Mengecek status invoice terbaru via API; bila PAID -> konfirmasi + ke struk.
-// Login wajib, hanya pemilik booking.
+
 if (!$is_logged_in) {
     $_SESSION['msg'] = ['type' => 'error', 'text' => 'Silahkan login terlebih dahulu.'];
     header("location: index.php?page=katalog");
@@ -41,7 +39,6 @@ if (!$bk) {
     exit();
 }
 
-// Sudah lunas sebelumnya -> langsung struk.
 if ($bk['status'] !== 'pending') {
     header("location: index.php?page=struk&id=" . (int) $bk['id']);
     exit();

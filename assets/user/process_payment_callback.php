@@ -1,9 +1,5 @@
 <?php
-// Webhook pembayaran Xendit (invoice). Daftarkan URL file ini di dashboard:
-// Settings -> Developers -> Callbacks (pakai URL publik/ngrok saat development).
-//
-// Alur: Xendit POST {id, external_id, status, paid_at, ...} + header x-callback-token
-//  -> verifikasi token -> status PAID: bookings confirmed + products rented (idempoten).
+
 session_start();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/payment_gateway.php';
@@ -58,7 +54,6 @@ if ($status === 'PAID') {
         exit();
     }
 
-    // Jangan percaya status dari body callback: ambil invoice resmi dari Xendit.
     $invoice_id = trim((string) ($data['id'] ?? ''));
     $inv = $invoice_id !== '' ? xendit_invoice_by_id($invoice_id) : xendit_invoice_by_ref($ref);
     if (!is_array($inv)) {
@@ -80,7 +75,7 @@ if ($status === 'PAID') {
     $amount_ok = $paid_amount >= $expected_amount;
 
     if (!$status_ok) {
-        // Invoice belum tercatat lunas (bisa eventual consistency): minta Xendit retry.
+
         error_log('callback invoice not paid yet ref=' . $ref . ' status=' . $inv_status);
         http_response_code(502);
         echo json_encode(['ok' => false, 'error' => 'invoice not paid yet']);
@@ -114,6 +109,5 @@ if ($status === 'PAID') {
     exit();
 }
 
-// Status lain (PENDING/EXPIRED/dll): akui saja, tidak ada aksi.
 http_response_code(200);
 echo json_encode(['ok' => true, 'ignored_status' => $status]);

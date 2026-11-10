@@ -1,16 +1,4 @@
 <?php
-/**
- * Klien AI MotorKu (AgentRouter / OpenAI Responses API).
- * Hanya dipakai di sisi server.
- *
- * Catatan penting:
- * - AgentRouter memblokir request yang mayoritas berbahasa Indonesia dengan
- *   error "content-blocked". Karena itu instruksi sistem ditulis dalam bahasa
- *   Inggris dan pesan pengguna dibungkus dalam prompt berbahasa Inggris,
- *   lalu model diminta menjawab dalam Bahasa Indonesia.
- * - Model gpt-6-astra memakai reasoning internal yang cukup besar, sehingga
- *   max_output_tokens perlu longgar.
- */
 
 require_once __DIR__ . '/config.php';
 
@@ -18,7 +6,6 @@ function ai_is_configured(): bool {
     return AI_API_KEY !== '' && function_exists('curl_init');
 }
 
-/** Snapshot katalog untuk konteks AI. */
 function ai_product_context($conn): string {
     if (!($conn instanceof mysqli)) return '';
     $res = $conn->query("SELECT name, brand, type, price_per_day, price_per_week, status FROM products ORDER BY brand, name");
@@ -86,7 +73,6 @@ function ai_system_instructions($conn, bool $is_logged_in, ?string $user_name): 
         . "- Keep answers concise and always in Indonesian.";
 }
 
-/** Ambil teks jawaban dari struktur OpenAI Responses API. */
 function ai_extract_text(array $data): string {
     $parts = [];
     $output = $data['output'] ?? [];
@@ -115,12 +101,6 @@ function ai_extract_text(array $data): string {
     return $text;
 }
 
-/**
- * POST JSON ke endpoint AI (retry otomatis untuk gangguan sesaat).
- * Ipresolve dipaksa IPv4: sebagian jaringan punya IPv6 "setengah mati"
- * yang bikin connect timeout 15 detik dari Apache.
- * Return ['raw' => string|false, 'http' => int, 'curl_error' => string].
- */
 function ai_http_post_json(string $url, array $headers, array $payload, int $attempts = 3): array {
     $last = ['raw' => false, 'http' => 0, 'curl_error' => 'not executed'];
 
@@ -143,7 +123,6 @@ function ai_http_post_json(string $url, array $headers, array $payload, int $att
 
         $last = ['raw' => $raw, 'http' => $http, 'curl_error' => $curl_error];
 
-        // Retry hanya untuk gangguan sesaat: koneksi gagal / timeout / 5xx.
         $retryable = ($raw === false) || ($http >= 500 && $http <= 599);
         if (!$retryable || $i === $attempts) {
             return $last;
@@ -159,7 +138,6 @@ function ai_http_post_json(string $url, array $headers, array $payload, int $att
     return $last;
 }
 
-/** Rapikan markdown sederhana agar enak dibaca sebagai teks biasa. */
 function ai_clean_reply(string $text): string {
     $text = preg_replace('/\*\*(.+?)\*\*/u', '$1', $text);
     $text = str_replace(['**', '__', '`'], '', $text);
@@ -167,11 +145,6 @@ function ai_clean_reply(string $text): string {
     return trim($text);
 }
 
-/**
- * Kirim percakapan ke provider AI aktif (gemini / agentrouter).
- * $history: array of ['role' => 'user'|'assistant', 'content' => string]
- * Return ['ok' => bool, 'text' => string, 'error' => string, 'code' => string].
- */
 function ai_request(string $instructions, string $input, array $history = []): array {
     if (!ai_is_configured()) {
         return ['ok' => false, 'text' => '', 'error' => 'Layanan AI belum dikonfigurasi.', 'code' => 'not_configured'];
@@ -181,7 +154,6 @@ function ai_request(string $instructions, string $input, array $history = []): a
         : ai_request_agentrouter($instructions, $input);
 }
 
-/** Ambil teks jawaban dari struktur OpenAI Chat Completions. */
 function ai_extract_chat_text(array $data): string {
     $content = $data['choices'][0]['message']['content'] ?? '';
     if (is_string($content)) return trim($content);
@@ -195,11 +167,6 @@ function ai_extract_chat_text(array $data): string {
     return '';
 }
 
-/**
- * Gemini via endpoint OpenAI-compatible (/chat/completions).
- * Gemini tidak memakai filter "content-blocked" seperti AgentRouter,
- * jadi pesan Bahasa Indonesia dikirim apa adanya (tanpa trik terjemahan).
- */
 function ai_request_gemini(string $instructions, string $input, array $history = []): array {
     $messages = [['role' => 'system', 'content' => $instructions]];
     foreach ($history as $h) {
@@ -264,10 +231,6 @@ function ai_request_gemini(string $instructions, string $input, array $history =
     return ['ok' => true, 'text' => ai_clean_reply($text), 'error' => '', 'code' => ''];
 }
 
-/**
- * AgentRouter via OpenAI Responses API (/responses).
- * Return ['ok' => bool, 'text' => string, 'error' => string, 'code' => string].
- */
 function ai_request_agentrouter(string $instructions, string $input): array {
     $payload = [
         'model' => AI_MODEL,
@@ -277,8 +240,6 @@ function ai_request_agentrouter(string $instructions, string $input): array {
         'store' => false,
     ];
 
-    // AgentRouter memfilter client berdasarkan fingerprint header.
-    // Samakan dengan coding agent yang diizinkan.
     $headers = [
         'Content-Type: application/json',
         'Accept: application/json',
@@ -322,7 +283,6 @@ function ai_request_agentrouter(string $instructions, string $input): array {
     return ['ok' => true, 'text' => ai_clean_reply($text), 'error' => '', 'code' => ''];
 }
 
-/** Bersihkan teks pengguna agar aman dimasukkan ke prompt. */
 function ai_wrap_user_text(string $text): string {
     $text = str_replace(["\r", "\n", "\t"], ' ', $text);
     $text = str_replace('"', "'", $text);
@@ -340,7 +300,6 @@ function ai_build_input(string $message, ?string $previous_question = null): str
     return $input;
 }
 
-/** HTTP GET sederhana untuk layanan terjemahan. */
 function ai_http_get(string $url, int $timeout = 10): ?string {
     if (!function_exists('curl_init')) return null;
     $ch = curl_init($url);
@@ -371,10 +330,6 @@ function ai_translate_google_response(?string $raw): string {
     return trim(implode('', $parts));
 }
 
-/**
- * Terjemahkan teks (fallback bila AgentRouter memblokir prompt Indonesia).
- * Beberapa penyedia dicoba berurutan; gagal semua -> string kosong.
- */
 function ai_translate(string $text, string $from = 'id', string $to = 'en'): string {
     if (!function_exists('curl_init') || trim($text) === '') return '';
 
@@ -389,7 +344,6 @@ function ai_translate(string $text, string $from = 'id', string $to = 'en'): str
         if ($result !== '') return $result;
     }
 
-    // Fallback terakhir: MyMemory.
     $url = 'https://api.mymemory.translated.net/get?q=' . rawurlencode($text)
         . '&langpair=' . rawurlencode($from . '|' . $to);
     $raw = ai_http_get($url, 10);
@@ -405,20 +359,13 @@ function ai_translate(string $text, string $from = 'id', string $to = 'en'): str
     return '';
 }
 
-/**
- * Susun percakapan (riwayat + pesan baru) lalu minta jawaban.
- * $history: array of ['role' => 'user'|'assistant', 'content' => string]
- */
 function ai_chat($conn, string $message, array $history, bool $is_logged_in, ?string $user_name): array {
     $instructions = ai_system_instructions($conn, $is_logged_in, $user_name);
 
-    // Gemini: kirim Bahasa Indonesia apa adanya + riwayat percakapan.
     if (AI_PROVIDER === 'gemini') {
         $result = ai_request($instructions, $message, $history);
         if ($result['ok']) return $result;
 
-        // Fallback: AgentRouter (gpt-6-astra) memakai prompt berbahasa Inggris
-        // agar tidak kena filter content-blocked.
         if ($result['code'] !== 'not_configured') {
             $english = ai_translate($message, 'id', 'en');
             $fallback_input = ($english !== '' ? $english : ai_wrap_user_text($message))
@@ -434,7 +381,6 @@ function ai_chat($conn, string $message, array $history, bool $is_logged_in, ?st
         return $result;
     }
 
-    // Ambil satu pertanyaan pengguna sebelumnya sebagai konteks.
     $previous_question = null;
     for ($i = count($history) - 1; $i >= 0; $i--) {
         $h = $history[$i];
@@ -447,15 +393,11 @@ function ai_chat($conn, string $message, array $history, bool $is_logged_in, ?st
 
     $result = ai_request($instructions, ai_build_input($message, $previous_question));
 
-    // Retry sekali untuk gangguan koneksi sesaat.
     if (!$result['ok'] && $result['code'] === 'curl') {
         sleep(1);
         $result = ai_request($instructions, ai_build_input($message, $previous_question));
     }
 
-    // AgentRouter kadang memblokir prompt berbahasa Indonesia. Coba ulang,
-    // lalu fallback: terjemahkan pertanyaan ke Inggris dan minta jawaban
-    // tetap dalam Bahasa Indonesia.
     if (!$result['ok'] && $result['code'] === 'content-blocked') {
         sleep(1);
         $result = ai_request($instructions, ai_build_input($message, $previous_question));

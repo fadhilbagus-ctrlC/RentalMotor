@@ -1,5 +1,5 @@
 <?php
-// Get product detail
+
 $product_id = intval($_GET['id'] ?? 0);
 $stmt = $conn->prepare("SELECT * FROM products WHERE id=? AND status='available'");
 if ($stmt === false) {
@@ -22,7 +22,6 @@ if (!$product) {
 
 $today = date('Y-m-d');
 
-// Helper path gambar: dukung 'uploads/x.jpg', 'beat.jpg' (di assets/), atau kosong
 $product_image_file = null;
 if (!empty($product['image'])) {
     $candidates = [
@@ -39,11 +38,11 @@ if (!empty($product['image'])) {
 ?>
 
 <div class="container">
-    <!-- BREADCRUMB -->
+
     <a href="index.php?page=katalog" class="detail-back-link">&#8592; Kembali ke Katalog</a>
 
     <div class="detail-layout">
-        <!-- GAMBAR MOTOR -->
+
         <div class="detail-image">
             <?php if ($product_image_file): ?>
                 <img src="../<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
@@ -52,7 +51,6 @@ if (!empty($product['image'])) {
             <?php endif; ?>
         </div>
 
-        <!-- INFO MOTOR -->
         <div class="detail-info">
             <span class="brand-tag"><?= htmlspecialchars($product['brand']) ?></span>
             <h1><?= htmlspecialchars($product['name']) ?></h1>
@@ -80,7 +78,6 @@ if (!empty($product['image'])) {
         </div>
     </div>
 
-    <!-- FORM BOOKING -->
     <div class="booking-form">
         <h2>&#128197; Form Booking Sewa Motor</h2>
         <div class="alert alert-info" style="margin-bottom:16px;font-size:13px;">
@@ -110,7 +107,6 @@ if (!empty($product['image'])) {
                 </div>
             </div>
 
-            <!-- BOOKING SUMMARY -->
             <div class="booking-summary" id="bookingSummary">
                 <h3>Ringkasan Booking</h3>
                 <div class="summary-row">

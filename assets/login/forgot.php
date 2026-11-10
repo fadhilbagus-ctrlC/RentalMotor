@@ -2,7 +2,6 @@
 session_start();
 require_once __DIR__ . '/../config.php';
 
-// Sudah login -> tidak perlu halaman ini.
 if (isset($_SESSION['user_id'], $_SESSION['role'])) {
     if ($_SESSION['role'] === 'admin') {
         header("location: ../admin/index.php");

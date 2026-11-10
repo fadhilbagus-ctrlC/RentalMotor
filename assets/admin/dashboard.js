@@ -1,4 +1,3 @@
-// Tooltip grafik omzet
 (function () {
     const chart = document.getElementById('omzetChart');
     const tooltip = document.getElementById('chartTooltip');

@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&family=IBM+Plex+Serif:wght@600;700&display=swap');
 
 * {
@@ -15,9 +14,6 @@ body {
     flex-direction: column;
 }
 
-/* ============================================
-   NAVBAR
-   ============================================ */
 .navbar {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     color: #fff;
@@ -114,9 +110,6 @@ body {
     object-fit: cover;
 }
 
-/* ============================================
-   PAGE TRANSITION (fade-in antar halaman)
-   ============================================ */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
@@ -127,9 +120,6 @@ body {
     flex: 1 0 auto;
 }
 
-/* ============================================
-   CONTAINER
-   ============================================ */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -141,9 +131,6 @@ body {
     padding-top: 24px;
 }
 
-/* ============================================
-   HERO SECTION
-   ============================================ */
 .hero-shell {
     max-width: 1200px;
     margin: 18px auto 24px;
@@ -264,9 +251,6 @@ body {
     color: #7dd3fc;
 }
 
-/* ============================================
-   HERO PANEL (tabs + search)
-   ============================================ */
 .hero-panel {
     position: relative;
     z-index: 5;
@@ -433,9 +417,6 @@ body {
     text-decoration: underline;
 }
 
-/* ============================================
-   SECTION TITLE
-   ============================================ */
 .section-title {
     font-size: 22px;
     font-weight: 700;
@@ -455,9 +436,6 @@ body {
     border-radius: 2px;
 }
 
-/* ============================================
-   PRODUCT GRID
-   ============================================ */
 .product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -576,9 +554,6 @@ body {
     cursor: not-allowed;
 }
 
-/* ============================================
-   DETAIL PAGE
-   ============================================ */
 .detail-back-link {
     display: inline-flex;
     align-items: center;
@@ -732,9 +707,6 @@ body {
     line-height: 1.7;
 }
 
-/* ============================================
-   BOOKING FORM
-   ============================================ */
 .booking-form {
     background: #fff;
     border-radius: 14px;
@@ -788,9 +760,6 @@ body {
     border-color: #7494ec;
 }
 
-/* ============================================
-   BOOKING SUMMARY
-   ============================================ */
 .booking-summary {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     color: #fff;
@@ -838,9 +807,6 @@ body {
     font-size: 22px;
 }
 
-/* ============================================
-   CHECKOUT PAGE
-   ============================================ */
 .checkout-layout {
     display: grid;
     grid-template-columns: 1.5fr 1fr;
@@ -911,9 +877,6 @@ body {
     margin-top: 6px;
 }
 
-/* ============================================
-   BUTTONS
-   ============================================ */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -949,9 +912,6 @@ body {
 .btn-block { width: 100%; }
 .btn-lg { padding: 14px 32px; font-size: 16px; }
 
-/* ============================================
-   TABLE (RIWAYAT)
-   ============================================ */
 .table-wrapper {
     overflow-x: auto;
     background: #fff;
@@ -1015,9 +975,6 @@ table .motor-cell .motor-thumb .placeholder-img {
     color: #ccc;
 }
 
-/* ============================================
-   BADGE STATUS
-   ============================================ */
 .badge {
     display: inline-block;
     padding: 4px 12px;
@@ -1035,9 +992,6 @@ table .motor-cell .motor-thumb .placeholder-img {
 .badge-rented { background: #f8d7da; color: #721c24; }
 .badge-maintenance { background: #fff3cd; color: #856404; }
 
-/* ============================================
-   STAT CARDS
-   ============================================ */
 .stat-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -1138,9 +1092,6 @@ table .motor-cell .motor-thumb .placeholder-img {
     padding: 28px 18px;
 }
 
-/* ============================================
-   ALERT
-   ============================================ */
 .alert {
     padding: 14px 18px;
     border-radius: 10px;
@@ -1203,9 +1154,6 @@ table .motor-cell .motor-thumb .placeholder-img {
 .alert-info { background: #cce5ff; color: #004085; }
 .alert-warning { background: #fff3cd; color: #856404; }
 
-/* ============================================
-   PROFILE
-   ============================================ */
 .profile-layout {
     display: grid;
     grid-template-columns: 1fr 1.5fr;
@@ -1277,9 +1225,6 @@ table .motor-cell .motor-thumb .placeholder-img {
     border-bottom: 2px solid #f0f0f0;
 }
 
-/* ============================================
-   EMPTY STATE
-   ============================================ */
 .empty-state {
     text-align: center;
     padding: 60px 20px;
@@ -1305,9 +1250,6 @@ table .motor-cell .motor-thumb .placeholder-img {
     margin-bottom: 20px;
 }
 
-/* ============================================
-   FOOTER
-   ============================================ */
 .footer {
     background: #1a1a2e;
     color: #aaa;
@@ -1317,9 +1259,6 @@ table .motor-cell .motor-thumb .placeholder-img {
     margin-top: 40px;
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
 @media (max-width: 992px) {
     .detail-layout,
     .checkout-layout,

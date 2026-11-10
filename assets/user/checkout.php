@@ -1,12 +1,11 @@
 <?php
-// Checkout page - harus login dulu, tetap di index sebagai guest
+
 if (!$is_logged_in) {
     $_SESSION['msg'] = ['type' => 'error', 'text' => 'Silahkan login terlebih dahulu, untuk melanjutkan pemesanan.'];
     header("location: index.php?page=katalog");
     exit();
 }
 
-// Tampilkan ringkasan booking sebelum konfirmasi
 $booking_id = intval($_GET['id'] ?? 0);
 
 $stmt = $conn->prepare("
@@ -42,7 +41,7 @@ if (!$booking) {
     <h2 class="section-title">Checkout Booking #<?= $booking['id'] ?></h2>
 
     <div class="checkout-layout">
-        <!-- DETAIL BOOKING -->
+
         <div class="checkout-card">
             <h2>&#128666; Detail Motor</h2>
             <div class="checkout-item">
@@ -83,7 +82,6 @@ if (!$booking) {
             </div>
         </div>
 
-        <!-- RINGKASAN HARGA -->
         <div class="checkout-card">
             <h2>&#128176; Ringkasan Harga</h2>
 

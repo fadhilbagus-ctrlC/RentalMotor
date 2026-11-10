@@ -13,9 +13,6 @@ if (!in_array($page, $allowed_pages, true)) {
     $page = 'dashboard';
 }
 
-// ============================================
-// HELPER
-// ============================================
 function stat_count($conn, string $sql): int {
     $res = $conn->query($sql);
     if ($res === false) {
@@ -259,9 +256,6 @@ function admin_icon(string $name, string $class = 'icon'): string {
     return '<svg class="' . htmlspecialchars($class) . '" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $path . '</svg>';
 }
 
-// ============================================
-// RENTANG TANGGAL
-// ============================================
 $bulan_short = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 $bulan_full = [1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 $hari_short = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
@@ -319,12 +313,8 @@ if ($previous_stat['revenue'] > 0) {
 }
 $average_revenue = $range_stat['total'] > 0 ? $range_stat['revenue'] / $range_stat['total'] : 0;
 
-// Badge pesanan menunggu (semua waktu)
 $pending_total = stat_count($conn, "SELECT COUNT(*) AS total FROM bookings WHERE status='pending'");
 
-// ============================================
-// DATA GRAFIK
-// ============================================
 $chart_monthly = ($range === '12m');
 $chart_series = [];
 $cursor = $chart_monthly ? $range_start->modify('first day of this month') : $range_start;
@@ -410,9 +400,6 @@ $chart_mobile = admin_chart_geometry($chart_series, $chart_axis_max, [
     'show_y' => false,
 ]);
 
-// ============================================
-// PRODUK TERLARIS
-// ============================================
 $top_products = [];
 $product_stmt = $conn->prepare("
     SELECT p.name, p.brand,
@@ -444,9 +431,6 @@ foreach ($top_products as $product) {
     $top_product_max = max($top_product_max, (int) $product['total']);
 }
 
-// ============================================
-// TRANSAKSI TERBARU
-// ============================================
 $latest_bookings = [];
 $latest_stmt = $conn->prepare("
     SELECT b.id, b.status, b.created_at, b.pickup_date, b.total_price, COALESCE(b.fine_amount, 0) AS fine_amount,
@@ -480,15 +464,11 @@ $booking_label = [
     'cancelled' => 'Dibatalkan',
 ];
 
-// ============================================
-// GET ALL USERS
-// ============================================
 $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
 if ($users === false) {
     error_log("admin users query failed: " . $conn->error);
 }
 
-// GET CURRENT USER PROFILE
 $profile = null;
 $stmt = $conn->prepare("SELECT * FROM users WHERE id=?");
 if ($stmt !== false) {
@@ -504,7 +484,6 @@ if (!is_array($profile)) {
     $profile = ['name' => $_SESSION['name'] ?? 'Admin', 'email' => ''];
 }
 
-// FLASH MESSAGE
 $msg = $_SESSION['msg'] ?? null;
 unset($_SESSION['msg']);
 
@@ -532,7 +511,6 @@ $range_unit = $chart_monthly ? 'bulan' : 'hari';
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
     <a href="index.php?page=dashboard" class="sidebar-brand">
         <span class="brand-mark"><?= admin_icon('scooter') ?></span>
@@ -599,10 +577,8 @@ $range_unit = $chart_monthly ? 'bulan' : 'hari';
     </div>
 </aside>
 
-<!-- MAIN CONTENT -->
 <main class="main-content">
 
-    <!-- TOPBAR -->
     <header class="topbar">
         <h1><?= htmlspecialchars($page_titles[$page] ?? 'Admin') ?></h1>
         <div class="topbar-actions">
@@ -629,7 +605,7 @@ $range_unit = $chart_monthly ? 'bulan' : 'hari';
         <?php endif; ?>
 
         <?php if ($page === 'dashboard'): ?>
-            <!-- DASHBOARD -->
+
             <section class="dash-head">
                 <div>
                     <h2>Ringkasan penyewaan</h2>
@@ -691,7 +667,6 @@ $range_unit = $chart_monthly ? 'bulan' : 'hari';
                 </article>
             </div>
 
-            <!-- GRAFIK -->
             <section class="panel chart-panel">
                 <div class="panel-head">
                     <div>
@@ -732,7 +707,7 @@ $range_unit = $chart_monthly ? 'bulan' : 'hari';
             </section>
 
             <div class="dashboard-grid">
-                <!-- PRODUK TERLARIS -->
+
                 <section class="panel">
                     <div class="panel-head">
                         <div>
@@ -766,7 +741,6 @@ $range_unit = $chart_monthly ? 'bulan' : 'hari';
                     <?php endif; ?>
                 </section>
 
-                <!-- TRANSAKSI TERBARU -->
                 <section class="panel">
                     <div class="panel-head">
                         <div>
@@ -808,7 +782,6 @@ $range_unit = $chart_monthly ? 'bulan' : 'hari';
                 </section>
             </div>
 
-        <!-- USERS PAGE -->
         <?php elseif ($page === 'users'): ?>
             <div class="content-panel">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
@@ -854,7 +827,6 @@ $range_unit = $chart_monthly ? 'bulan' : 'hari';
                 </div>
             </div>
 
-            <!-- ADD MODAL -->
             <div class="modal-overlay" id="addModal">
                 <div class="modal">
                     <h2>Tambah User</h2>
@@ -888,7 +860,6 @@ $range_unit = $chart_monthly ? 'bulan' : 'hari';
                 </div>
             </div>
 
-            <!-- EDIT MODAL -->
             <div class="modal-overlay" id="editModal">
                 <div class="modal">
                     <h2>Edit User</h2>
@@ -923,15 +894,12 @@ $range_unit = $chart_monthly ? 'bulan' : 'hari';
                 </div>
             </div>
 
-        <!-- PRODUCTS PAGE -->
         <?php elseif ($page === 'products'): ?>
             <?php include __DIR__ . '/products.php'; ?>
 
-        <!-- BOOKINGS PAGE -->
         <?php elseif ($page === 'bookings'): ?>
             <?php include __DIR__ . '/bookings.php'; ?>
 
-        <!-- PROFILE PAGE -->
         <?php elseif ($page === 'profile'): ?>
             <div class="content-panel">
                 <h2>Profile Saya</h2>
@@ -1003,7 +971,6 @@ function openEditProduct(p) {
     document.getElementById('editProductModal').classList.add('active');
 }
 
-// Close modal on overlay click
 document.querySelectorAll('.modal-overlay').forEach(modal => {
     modal.addEventListener('click', function(e) {
         if (e.target === this) this.classList.remove('active');

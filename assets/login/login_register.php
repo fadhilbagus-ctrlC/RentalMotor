@@ -3,7 +3,6 @@
 session_start();
 require_once __DIR__ . '/../config.php';
 
-// Validasi CSRF untuk semua POST (login & register)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !csrf_validate($_POST['csrf_token'] ?? null)) {
     $form = isset($_POST['register']) ? 'register' : 'login';
     $_SESSION[$form . '_error'] = 'Sesi tidak valid. Silakan muat ulang halaman dan coba lagi.';
@@ -73,7 +72,7 @@ if(isset($_POST['register'])){
     }
 
     header("location: login.php");
-    exit(); 
+    exit();
 }
 
 if (isset($_POST['login'])){
@@ -107,7 +106,6 @@ if (isset($_POST['login'])){
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = $user['role'];
 
-            // Otomatis sesuai role di database (tanpa pilih manual)
             if($user['role'] === 'admin') {
                 header("location: ../admin/index.php");
             }

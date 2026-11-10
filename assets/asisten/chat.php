@@ -41,6 +41,25 @@ if (mb_strlen($message) > AI_MAX_INPUT_CHARS) {
     ai_json(422, ['ok' => false, 'error' => 'Pesan terlalu panjang (maksimal ' . AI_MAX_INPUT_CHARS . ' karakter).']);
 }
 
+$user_location = null;
+$raw_location = $payload['location'] ?? null;
+if (is_array($raw_location)) {
+    $lat = $raw_location['lat'] ?? null;
+    $lng = $raw_location['lng'] ?? null;
+    if (is_numeric($lat) && is_numeric($lng)) {
+        $lat = (float) $lat;
+        $lng = (float) $lng;
+        if ($lat >= -90 && $lat <= 90 && $lng >= -180 && $lng <= 180) {
+            $user_location = ['lat' => $lat, 'lng' => $lng];
+        }
+    }
+}
+
+$distance_km = null;
+if ($user_location !== null && defined('STORE_LAT') && defined('STORE_LNG')) {
+    $distance_km = ai_distance_km($user_location['lat'], $user_location['lng'], STORE_LAT, STORE_LNG);
+}
+
 $now = time();
 $times = $_SESSION['ai_chat_times'] ?? [];
 if (!is_array($times)) $times = [];
@@ -59,7 +78,7 @@ $user_name = $is_logged_in ? ($_SESSION['name'] ?? null) : null;
 $history = $_SESSION['ai_chat_history'] ?? [];
 if (!is_array($history)) $history = [];
 
-$result = ai_chat($conn, $message, $history, $is_logged_in, $user_name);
+$result = ai_chat($conn, $message, $history, $is_logged_in, $user_name, $user_location);
 
 if (!$result['ok']) {
     ai_json(503, ['ok' => false, 'error' => $result['error']]);
@@ -76,4 +95,9 @@ ai_json(200, [
     'ok' => true,
     'reply' => $result['text'],
     'remaining' => max(0, AI_RATE_LIMIT - count($times)),
+    'distance_km' => $distance_km,
+    'store' => [
+        'name' => STORE_NAME,
+        'address' => STORE_ADDRESS,
+    ],
 ]);

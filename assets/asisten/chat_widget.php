@@ -3,6 +3,9 @@ require_once __DIR__ . '/../config.php';
 ?>
 <div class="ai-chat" id="aiChat"
      data-endpoint="../asisten/chat.php"
+     data-store-lat="<?= htmlspecialchars((string) STORE_LAT, ENT_QUOTES) ?>"
+     data-store-lng="<?= htmlspecialchars((string) STORE_LNG, ENT_QUOTES) ?>"
+     data-store-name="<?= htmlspecialchars(STORE_NAME, ENT_QUOTES) ?>"
      data-csrf="<?= htmlspecialchars(csrf_token(), ENT_QUOTES) ?>">
 
     <button type="button" class="ai-chat-toggle" id="aiChatToggle"
@@ -34,7 +37,19 @@ require_once __DIR__ . '/../config.php';
                 <button type="button" data-quick="Bagaimana cara booking motor?">Cara booking</button>
                 <button type="button" data-quick="Jam operasional MotorKu kapan?">Jam operasional</button>
                 <button type="button" data-quick="Metode pembayaran apa saja yang tersedia?">Pembayaran</button>
+                <button type="button" data-quick="Di mana lokasi pengambilan MotorKu?">Lokasi</button>
             </div>
+        </div>
+
+        <div class="ai-chat-locbar" aria-live="polite">
+            <button type="button" class="ai-chat-locbtn" id="aiChatLocation" aria-pressed="false"
+                    title="Bagikan lokasi Anda untuk melihat perkiraan jarak ke toko">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span id="aiChatLocationText">Lokasi saya</span>
+            </button>
         </div>
 
         <form class="ai-chat-form" id="aiChatForm">
@@ -46,6 +61,6 @@ require_once __DIR__ . '/../config.php';
                 </svg>
             </button>
         </form>
-        <p class="ai-chat-note">Jawaban AI bisa kurang tepat. Cek katalog untuk info terbaru.</p>
+        <p class="ai-chat-note">Jawaban AI bisa kurang tepat. Lokasi hanya dikirim setelah Anda menekan tombol lokasi.</p>
     </section>
 </div>

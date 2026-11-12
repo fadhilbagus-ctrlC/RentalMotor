@@ -62,22 +62,12 @@ export const CtaScene: React.FC<{ frames: number }> = ({ frames }) => {
           >
             MotorKu Wonosobo
           </div>
-          <div
-            style={{
-              fontSize: 36,
-              color: 'rgba(255,255,255,0.85)',
-              marginTop: 18,
-              fontWeight: 500,
-            }}
-          >
-            Jl. Raya Wonosobo No. 88, Jawa Tengah
-          </div>
-          <div style={{ fontSize: 30, color: 'rgba(255,255,255,0.7)', marginTop: 8 }}>
+          <div style={{ fontSize: 32, color: 'rgba(255,255,255,0.8)', marginTop: 20 }}>
             Setiap hari 05.00 – 23.00 WIB
           </div>
           <div
             style={{
-              marginTop: 56,
+              marginTop: 44,
               transform: `scale(${(0.7 + btn * 0.3) * pulse})`,
               opacity: btn,
               background: '#7494ec',

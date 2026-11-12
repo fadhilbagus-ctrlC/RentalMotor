@@ -13,3 +13,7 @@ desktop.ini
 # File secret lokal (dibaca dari C:\Laragon\etc, tidak pernah di-commit)
 *xendit_secrets.php
 *ai_secrets.php
+
+# Video promo (Remotion)
+video/node_modules/
+video/out/

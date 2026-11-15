@@ -31,7 +31,7 @@ FPS = 30
 PAD_AFTER = 0.45  # jeda napas antar scene (detik)
 
 SCENES = [
-    ("intro", "Liburan ke Dieng? Jangan jalan kaki. Sewa motor di MotorKu."),
+    ("intro", "Liburan ke Dieng? Jangan jalan kaki. Sewa motor di MotorKu sekarang juga."),
     ("hero", "Cari motor favoritmu cepat. Pilih merek, tipe, dan tanggal sewa dari website."),
     ("katalog", "Motor matic lengkap: Mio, Scoopy, Beat, Vario, PCX, sampai NMAX. Harga mulai tujuh puluh ribu per hari."),
     ("booking", "Booking online butuh hitungan menit. Pembayaran aman lewat DANA, GoPay, ShopeePay, OVO, atau QRIS."),

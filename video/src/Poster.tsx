@@ -163,7 +163,7 @@ export const MotorKuPoster: React.FC = () => {
             borderRadius: 999,
           }}
         >
-          RENTAL MOTOR · DIENG
+          RENTAL MOTOR
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-# Video Promo MotorKu — 9:16 (Remotion)
+# Video Promo Motorent — 9:16 (Remotion)
 
 Video promosi vertikal **1080×1920 (9:16), 30 fps, ±40 detik**. Seluruh UI aplikasi dibuat ulang sebagai komponen React (mock UI) — bukan screenshot aplikasi.
 
@@ -36,7 +36,7 @@ node tools/make_qr.mjs
 npm run studio
 
 # 5. Render final
-npx remotion render MotorKuPromo out/motorku-promo-9x16-v2.mp4 --codec=h264 --browser-executable="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --log=error
+npx remotion render MotorentPromo out/motorent-promo-9x16-v2.mp4 --codec=h264 --browser-executable="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --log=error
 ```
 
 ## Catatan

@@ -101,7 +101,7 @@ export const CtaScene: React.FC<{ frames: number }> = ({ frames }) => {
               color: COLORS.inkSoft,
             }}
           >
-            Scan — repo GitHub MotorKu
+            Scan — repo GitHub Motorent
           </div>
         </div>
       </div>

@@ -25,8 +25,7 @@ export const Navbar: React.FC<{ frame: number; fps: number }> = ({ frame, fps })
       }}
     >
       <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: -1 }}>
-        <span style={{ color: COLORS.brand }}>Motor</span>
-        <span style={{ color: COLORS.ink }}>Ku</span>
+        <span style={{ color: COLORS.brand }}>Motorent</span>
       </div>
       <div
         style={{
@@ -443,7 +442,7 @@ export const BookingForm: React.FC<{ frame: number; fps: number }> = ({ frame, f
   );
 };
 
-// Chat widget mock — asisten AI MotorKu
+// Chat widget mock — asisten AI Motorent
 export const ChatWidget: React.FC<{ frame: number; fps: number }> = ({ frame, fps }) => {
   const pop = enter(frame, fps, 4);
   const userPop = enter(frame, fps, 16);
@@ -482,7 +481,7 @@ export const ChatWidget: React.FC<{ frame: number; fps: number }> = ({ frame, fp
           <ChatIcon size={40} color="#ffffff" />
         </div>
         <div>
-          <div style={{ fontSize: 42, fontWeight: 800, color: COLORS.ink }}>MotorKu AI</div>
+          <div style={{ fontSize: 42, fontWeight: 800, color: COLORS.ink }}>Motorent AI</div>
           <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 16, height: 16, borderRadius: '50%', background: COLORS.green }} />
             <div style={{ fontSize: 26, color: COLORS.muted, fontWeight: 600 }}>
@@ -524,7 +523,7 @@ export const ChatWidget: React.FC<{ frame: number; fps: number }> = ({ frame, fp
             transform: `translateY(${(1 - aiPop) * 24}px)`,
           }}
         >
-          Toko MotorKu buka tiap hari 05.00–23.00 WIB. Bisa ambil motor langsung di tempat 📍
+          Toko Motorent buka tiap hari 05.00–23.00 WIB. Bisa ambil motor langsung di tempat 📍
         </div>
         <div
           style={{

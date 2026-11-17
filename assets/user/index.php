@@ -45,7 +45,7 @@ if ($msg) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MotorKu - Rental Motor</title>
+    <title>Motorent - Rental Motor</title>
     <link rel="stylesheet" href="user.css?v=<?= filemtime(__DIR__ . '/user.css') ?>">
     <link rel="stylesheet" href="../asisten/chat.css?v=<?= filemtime(__DIR__ . '/../asisten/chat.css') ?>">
 </head>
@@ -53,8 +53,8 @@ if ($msg) {
 
 <nav class="navbar">
     <a href="index.php" class="navbar-brand">
-        <img src="../login/logo-white.png" alt="MotorKu" class="navbar-logo">
-        <h2>MotorKu</h2>
+        <img src="../login/logo-white.png" alt="Motorent" class="navbar-logo">
+        <h2>Motorent</h2>
         <span>Rental Motor</span>
     </a>
     <div class="navbar-user">
@@ -89,7 +89,7 @@ if ($msg) {
 </div>
 
 <footer class="footer">
-    <p>&copy; MotorKu - Rental Motor Terpercaya</p>
+    <p>&copy; Motorent - Rental Motor Terpercaya</p>
 </footer>
 
 <?php include __DIR__ . '/../asisten/chat_widget.php'; ?>

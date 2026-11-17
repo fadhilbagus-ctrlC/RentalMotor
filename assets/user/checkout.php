@@ -116,7 +116,7 @@ if (!$booking) {
                     'gopay' => ['label' => 'GoPay', 'app' => 'gojek://gopay', 'web' => 'https://www.gojek.com/gopay/', 'guide' => 'Buka Gojek → GoPay → Bayar → masukkan nominal pas → cantumkan ID booking di catatan.'],
                     'shopeepay' => ['label' => 'ShopeePay', 'app' => 'shopeepay://', 'web' => 'https://shopee.co.id/', 'guide' => 'Buka Shopee → ShopeePay → Transfer → masukkan nominal pas → cantumkan ID booking di catatan.'],
                     'ovo' => ['label' => 'OVO', 'app' => 'ovo://', 'web' => 'https://www.ovo.id/', 'guide' => 'Buka OVO → Transfer → masukkan nominal pas → cantumkan ID booking di catatan.'],
-                    'qris' => ['label' => 'QRIS', 'app' => '', 'web' => '', 'guide' => 'Pindai kode QRIS MotorKu dengan aplikasi e-wallet apapun → masukkan nominal pas → simpan bukti.'],
+                    'qris' => ['label' => 'QRIS', 'app' => '', 'web' => '', 'guide' => 'Pindai kode QRIS Motorent dengan aplikasi e-wallet apapun → masukkan nominal pas → simpan bukti.'],
                 ];
                 ?>
                 <div class="payment-methods" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;">

@@ -63,7 +63,7 @@ export const IntroScene: React.FC<{ frames: number }> = ({ frames }) => {
             boxShadow: '0 22px 50px rgba(93,127,224,0.4)',
           }}
         >
-          Sewa motor di MotorKu
+          Sewa motor di Motorent
         </div>
       </div>
       <div

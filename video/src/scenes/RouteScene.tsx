@@ -173,7 +173,7 @@ export const RouteScene: React.FC<{ frames: number }> = ({ frames }) => {
       <TopChip label="RUTE PERJALANAN" frame={frame} frames={frames} />
       <PinDot x={P0.x} y={P0.y} color={COLORS.brand} pop={startPop} />
       <PinDot x={P2.x} y={P2.y} color={COLORS.purple} pop={endPop} />
-      <PinLabel x={P0.x} y={P0.y} label="MotorKu" pop={startPop} />
+      <PinLabel x={P0.x} y={P0.y} label="Motorent" pop={startPop} />
       <PinLabel x={P2.x} y={P2.y} label="Dieng Plateau 🏔️" pop={endPop} />
       <div
         style={{

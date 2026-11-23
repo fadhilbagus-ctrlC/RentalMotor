@@ -24,14 +24,14 @@ export const Navbar: React.FC<{ frame: number; fps: number }> = ({ frame, fps })
         transform: `translateY(${(1 - pop) * -36}px)`,
       }}
     >
-      <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: -1 }}>
-        <span style={{ color: COLORS.brand }}>Motorent</span>
+      <div style={{ fontSize: 38, fontWeight: 800, letterSpacing: -1 }}>
+        <span style={{ color: COLORS.brand }}>Rentalmotor</span>
       </div>
       <div
         style={{
           display: 'flex',
-          gap: 30,
-          marginLeft: 44,
+          gap: 24,
+          marginLeft: 32,
           fontSize: 28,
           fontWeight: 600,
           color: COLORS.inkSoft,
@@ -442,7 +442,7 @@ export const BookingForm: React.FC<{ frame: number; fps: number }> = ({ frame, f
   );
 };
 
-// Chat widget mock — asisten AI Motorent
+// Chat widget mock — asisten AI Rentalmotor
 export const ChatWidget: React.FC<{ frame: number; fps: number }> = ({ frame, fps }) => {
   const pop = enter(frame, fps, 4);
   const userPop = enter(frame, fps, 16);
@@ -481,7 +481,7 @@ export const ChatWidget: React.FC<{ frame: number; fps: number }> = ({ frame, fp
           <ChatIcon size={40} color="#ffffff" />
         </div>
         <div>
-          <div style={{ fontSize: 42, fontWeight: 800, color: COLORS.ink }}>Motorent AI</div>
+          <div style={{ fontSize: 42, fontWeight: 800, color: COLORS.ink }}>Rentalmotor AI</div>
           <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 16, height: 16, borderRadius: '50%', background: COLORS.green }} />
             <div style={{ fontSize: 26, color: COLORS.muted, fontWeight: 600 }}>
@@ -523,7 +523,7 @@ export const ChatWidget: React.FC<{ frame: number; fps: number }> = ({ frame, fp
             transform: `translateY(${(1 - aiPop) * 24}px)`,
           }}
         >
-          Toko Motorent buka tiap hari 05.00–23.00 WIB. Bisa ambil motor langsung di tempat 📍
+          Toko Rentalmotor buka tiap hari 05.00–23.00 WIB. Bisa ambil motor langsung di tempat 📍
         </div>
         <div
           style={{

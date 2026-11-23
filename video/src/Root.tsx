@@ -1,12 +1,12 @@
 import React from 'react';
 import { Composition } from 'remotion';
 import { TIMINGS } from './timings';
-import { MotorentPromo } from './MotorentPromo';
+import { RentalmotorPromo } from './RentalmotorPromo';
 
 export const RemotionRoot: React.FC = () => (
   <Composition
-    id="MotorentPromo"
-    component={MotorentPromo}
+    id="RentalmotorPromo"
+    component={RentalmotorPromo}
     durationInFrames={TIMINGS.totalFrames}
     fps={TIMINGS.fps}
     width={1080}

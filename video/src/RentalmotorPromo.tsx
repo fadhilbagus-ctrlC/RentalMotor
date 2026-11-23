@@ -22,7 +22,7 @@ const SCENES: Record<SceneId, React.FC<{ frames: number }>> = {
   cta: CtaScene,
 };
 
-export const MotorentPromo: React.FC = () => (
+export const RentalmotorPromo: React.FC = () => (
   <AbsoluteFill style={{ backgroundColor: COLORS.bg, fontFamily: FONT }}>
     {TIMINGS.scenes.map((scene, i) => {
       const from = TIMINGS.scenes.slice(0, i).reduce((acc, s) => acc + s.frames, 0);

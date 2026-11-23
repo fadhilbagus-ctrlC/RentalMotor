@@ -18,7 +18,7 @@ export const AiScene: React.FC<{ frames: number }> = ({ frames }) => {
     >
       <GlowOrb x={-120} y={100} size={460} color="rgba(56,189,248,0.36)" frame={frame} speed={26} />
       <GlowOrb x={700} y={1100} size={420} color="rgba(168,85,247,0.30)" frame={frame} speed={32} />
-      <TopChip label="TANYA AI MOTORENT" frame={frame} frames={frames} />
+      <TopChip label="TANYA AI RENTALMOTOR" frame={frame} frames={frames} />
       <ChatWidget frame={frame} fps={fps} />
       <div
         style={{

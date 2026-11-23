@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lupa Password - Motorent</title>
+    <title>Lupa Password - Rentalmotor</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .forgot-side{position:absolute;left:0;top:0;width:50%;height:100%;background:#fff;border-right:1px solid #eee;display:flex;align-items:center;justify-content:center;color:#333;text-align:center;padding:40px;}

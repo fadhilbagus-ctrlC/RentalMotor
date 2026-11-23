@@ -506,7 +506,7 @@ $range_unit = $chart_monthly ? 'bulan' : 'hari';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($page_titles[$page] ?? 'Admin') ?> - Motorent</title>
+    <title><?= htmlspecialchars($page_titles[$page] ?? 'Admin') ?> - Rentalmotor</title>
     <link rel="stylesheet" href="dashboard.css?v=<?= filemtime(__DIR__ . '/dashboard.css') ?>">
 </head>
 <body>
@@ -515,7 +515,7 @@ $range_unit = $chart_monthly ? 'bulan' : 'hari';
     <a href="index.php?page=dashboard" class="sidebar-brand">
         <span class="brand-mark"><?= admin_icon('scooter') ?></span>
         <span class="brand-text">
-            <strong>Motorent</strong>
+            <strong>Rentalmotor</strong>
             <small>Admin Panel</small>
         </span>
     </a>

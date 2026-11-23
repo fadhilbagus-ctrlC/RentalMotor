@@ -74,7 +74,7 @@ $print_date = date('d M Y H:i');
 
     <div class="struk-paper">
         <div class="struk-head">
-            <div class="brand">Motorent</div>
+            <div class="brand">Rentalmotor</div>
             <div class="sub">Rental Motor Terpercaya</div>
             <h2 style="margin-top:10px;">Struk Pembayaran</h2>
             <div class="sub"><?= htmlspecialchars($struk_no) ?> &bull; <?= htmlspecialchars($print_date) ?></div>
@@ -105,7 +105,7 @@ $print_date = date('d M Y H:i');
         </table>
 
         <div class="struk-foot">
-            Simpan struk ini sebagai bukti pembayaran yang sah.<br>Terima kasih telah menyewa di Motorent.
+            Simpan struk ini sebagai bukti pembayaran yang sah.<br>Terima kasih telah menyewa di Rentalmotor.
         </div>
 
         <div class="struk-actions">

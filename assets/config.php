@@ -25,7 +25,7 @@ if (!defined('RETURN_DEADLINE_TIME')) define('RETURN_DEADLINE_TIME', '23:00');
 if (!defined('FINE_PER_20MIN')) define('FINE_PER_20MIN', 10000);
 if (!defined('FINE_BLOCK_MINUTES')) define('FINE_BLOCK_MINUTES', 20);
 
-if (!defined('STORE_NAME')) define('STORE_NAME', 'Motorent');
+if (!defined('STORE_NAME')) define('STORE_NAME', 'Rentalmotor');
 if (!defined('STORE_ADDRESS')) define('STORE_ADDRESS', 'Jl. Raya Wonosobo No. 88, Wonosobo, Jawa Tengah 56311');
 if (!defined('STORE_LAT')) define('STORE_LAT', -7.35952);
 if (!defined('STORE_LNG')) define('STORE_LNG', 109.90283);

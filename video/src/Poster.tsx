@@ -96,7 +96,7 @@ const PricePill: React.FC<{ name: string; price: string }> = ({ name, price }) =
   </div>
 );
 
-export const MotorentPoster: React.FC = () => {
+export const RentalmotorPoster: React.FC = () => {
   return (
     <AbsoluteFill
       style={{
@@ -182,7 +182,7 @@ export const MotorentPoster: React.FC = () => {
       >
         <LogoMark height={96} />
         <div style={{ fontSize: 62, fontWeight: 900, letterSpacing: -1 }}>
-          <span style={{ color: COLORS.brand }}>Motorent</span>
+          <span style={{ color: COLORS.brand }}>Rentalmotor</span>
         </div>
       </div>
 

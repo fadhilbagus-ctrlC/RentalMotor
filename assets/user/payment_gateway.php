@@ -58,7 +58,7 @@ function create_ewallet_charge(array $booking, string $method, string $number, a
     if (!payment_is_configured()) {
         return ['error' => 'Gateway belum dikonfigurasi (secret key / curl).'];
     }
-    $ref = 'MOTORKU-' . (int) $booking['id'] . '-' . date('YmdHis') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
+    $ref = 'RENTALMOTOR-' . (int) $booking['id'] . '-' . date('YmdHis') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
     $payload = [
         'external_id' => $ref,
         'amount' => (int) $booking['total_price'],

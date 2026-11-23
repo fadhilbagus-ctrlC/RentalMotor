@@ -24,7 +24,7 @@ ENV_FILE = ROOT / ".env"
 
 MODEL = "eleven_multilingual_v2"
 OUTPUT_FORMAT = "mp3_44100_128"
-SAMPLE_TEXT = "Liburan ke Dieng? Jangan jalan kaki. Sewa motor di Motorent."
+SAMPLE_TEXT = "Liburan ke Dieng? Jangan jalan kaki. Sewa motor di Rentalmotor."
 
 VOICES = [
     ("adam", "Adam", "pNInz6obpgDQGcFmaJgB"),
